@@ -177,6 +177,7 @@ function ValidatorContent() {
         if (isMounted) {
           setAiAnalysis(data);
           setAiLoading(false);
+          setAiError(null);
         }
       })
       .catch((err: unknown) => {
@@ -668,7 +669,7 @@ function ValidatorContent() {
                 )}
 
                 {/* Generic/Network Error State */}
-                {!aiLoading && !aiGenerating && aiError && aiError !== "NO_ANALYSIS" && (
+                {!aiLoading && !aiGenerating && aiError && aiError !== "NO_ANALYSIS" && !aiAnalysis && (
                   <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-center">
                     <p className="text-xs text-red-300">{aiError}</p>
                     <button

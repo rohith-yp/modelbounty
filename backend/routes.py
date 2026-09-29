@@ -1,5 +1,5 @@
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Body
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
@@ -368,3 +368,49 @@ def run_ai_analysis_endpoint(
         "created_at": analysis_record.created_at.isoformat() if hasattr(analysis_record.created_at, "isoformat") else str(analysis_record.created_at),
         "analysis": parsed_analysis,
     }
+
+
+# --- ML Model & Finding Verification Endpoints ---
+@api_router.get("/models/{model_id}/health")
+def model_health(model_id: str):
+    from backend.ml_engine import MLEngine
+    return MLEngine.get_model_health(model_id)
+
+
+@api_router.post("/models/{model_id}/predict")
+def model_predict(model_id: str, payload: Dict[str, Any] = Body(...)):
+    from backend.ml_engine import MLEngine
+    return MLEngine.predict(model_id, payload)
+
+
+@api_router.post("/findings/{finding_id}/verify")
+def verify_finding_endpoint(
+    finding_id: str,
+    payload: Optional[Dict[str, Any]] = Body(None),
+    db: Session = Depends(get_db)
+):
+    from backend.ml_engine import MLEngine
+    custom_payload = payload.get("custom_payload") if payload else None
+    return MLEngine.verify_finding(db, finding_id, custom_payload=custom_payload)
+
+
+@api_router.get("/findings/{finding_id}/verification")
+def get_verification_endpoint(
+    finding_id: str,
+    db: Session = Depends(get_db)
+):
+    from backend.ml_engine import MLEngine
+    v = MLEngine.get_latest_verification(db, finding_id)
+    if not v:
+        raise HTTPException(status_code=404, detail="No verification found for finding")
+    return v
+
+
+@api_router.get("/findings/{finding_id}/verification/history")
+def get_verification_history_endpoint(
+    finding_id: str,
+    db: Session = Depends(get_db)
+):
+    from backend.ml_engine import MLEngine
+    return MLEngine.get_verification_history(db, finding_id)
+

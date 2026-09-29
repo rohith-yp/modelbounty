@@ -121,6 +121,7 @@ class Finding(Base):
     validations = relationship("Validation", back_populates="finding", cascade="all, delete-orphan")
     rewards = relationship("Reward", back_populates="finding", cascade="all, delete-orphan")
     ai_analyses = relationship("AIAnalysis", back_populates="finding", cascade="all, delete-orphan")
+    verifications = relationship("Verification", back_populates="finding", cascade="all, delete-orphan")
 
 
 class Validation(Base):
@@ -185,3 +186,22 @@ class MLAnalysis(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     bounty = relationship("Bounty", back_populates="ml_analyses")
+
+
+class Verification(Base):
+    __tablename__ = "verifications"
+
+    id = Column(String, primary_key=True, default=generate_uuid)
+    finding_id = Column(String, ForeignKey("findings.id"), nullable=False, index=True)
+    model_id = Column(String, nullable=False)
+    model_name = Column(String, nullable=False)
+    prediction = Column(String, nullable=False)
+    prediction_value = Column(Float, nullable=False)
+    fraud_probability = Column(Float, nullable=False)
+    execution_time_ms = Column(Float, nullable=True)
+    verification_status = Column(String, nullable=False)
+    reproduced = Column(Float, nullable=False)
+    input_data = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    finding = relationship("Finding", back_populates="verifications")
