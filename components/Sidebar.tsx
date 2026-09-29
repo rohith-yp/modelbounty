@@ -43,69 +43,59 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="hidden w-64 shrink-0 border-r border-[#232732] bg-[#0C0D10] lg:flex lg:flex-col select-none">
-      {/* Brand Header */}
-      <div className="flex h-16 items-center border-b border-[#232732] px-5">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="flex h-7 w-7 items-center justify-center rounded border border-[#353B4A] bg-[#16181F] text-xs font-mono font-semibold text-[#E09F3E] transition group-hover:border-[#E09F3E]/60">
+    <aside className="hidden w-64 shrink-0 border-r border-white/[0.06] bg-[#090c11] lg:flex lg:flex-col">
+      <div className="flex h-20 items-center border-b border-white/[0.06] px-6">
+        <Link href="/" className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-400/30 bg-cyan-400/10 text-cyan-300">
             MB
           </div>
           <div>
-            <div className="text-xs font-semibold tracking-wider text-[#EDEDF0] uppercase font-mono">
-              MODEL<span className="text-[#E09F3E]">BOUNTY</span>
+            <div className="text-sm font-semibold text-white">
+              Model<span className="text-cyan-300">Bounty</span>
             </div>
-            <div className="text-[9px] uppercase tracking-[0.16em] text-[#525866] font-mono">
-              Verif. Protocol
+            <div className="text-[10px] text-zinc-600">
+              Verification Network
             </div>
           </div>
         </Link>
       </div>
 
-      {/* Navigation */}
-      <div className="flex-1 px-3 py-5">
-        <div className="mb-2.5 px-3 text-[10px] font-mono uppercase tracking-[0.16em] text-[#525866]">
-          Navigation Ledger
+      <div className="flex-1 px-3 py-6">
+        <div className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-600">
+          Workspace
         </div>
 
-        <nav className="space-y-0.5">
+        <nav className="space-y-1">
           {navigationItems.map((item) => {
             const active = isActive(item.href);
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`group flex items-center justify-between rounded px-3 py-2 text-xs transition ${
+                className={`block w-full rounded-lg px-3 py-2.5 text-left text-sm transition ${
                   active
-                    ? "bg-[#181B23] text-[#EDEDF0] font-medium border-l-2 border-[#E09F3E] pl-2.5"
-                    : "text-[#8C93A4] hover:bg-[#13151B] hover:text-[#EDEDF0]"
+                    ? "bg-cyan-300/10 text-cyan-200 font-medium"
+                    : "text-zinc-500 hover:bg-white/[0.03] hover:text-zinc-200"
                 }`}
               >
-                <span>{item.name}</span>
-                {active && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#E09F3E]" />
-                )}
+                {item.name}
               </Link>
             );
           })}
         </nav>
       </div>
 
-      {/* Telemetry / Network Footer */}
-      <div className="border-t border-[#232732] p-4 bg-[#090A0C]">
-        <div className="rounded border border-[#1C2029] bg-[#13151B] p-3">
-          <div className="flex items-center justify-between text-[10px] font-mono text-[#525866] uppercase tracking-wider">
-            <span>Escrow Net</span>
-            <span className="text-[9px] text-[#38A169] bg-[#38A169]/10 px-1.5 py-0.2 rounded font-mono">
-              Active
-            </span>
+      <div className="border-t border-white/[0.06] p-4">
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+          <div className="text-[10px] uppercase tracking-[0.15em] text-zinc-600">
+            Network
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#38A169] animate-pulse" />
-            <span className="text-xs text-[#EDEDF0] font-medium">Sepolia Testnet</span>
+            <span className="h-2 w-2 rounded-full bg-cyan-300" />
+            <span className="text-xs text-zinc-300">Testnet Connected</span>
           </div>
-          <div className="mt-1.5 flex items-center justify-between text-[10px] font-mono text-[#8C93A4]">
-            <span className="text-[#525866]">Contract</span>
-            <span className="text-[#8C93A4]">0x5FbD...aa</span>
+          <div className="mt-2 font-mono text-[10px] text-zinc-600">
+            Sepolia
           </div>
         </div>
       </div>

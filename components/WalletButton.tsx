@@ -46,95 +46,85 @@ export default function WalletButton() {
     <>
       <button
         onClick={() => setModalOpen(true)}
-        className="flex items-center gap-2 rounded border border-[#232732] bg-[#13151B] px-3 py-1.5 text-xs font-mono text-[#8C93A4] transition hover:border-[#3D4454] hover:text-[#EDEDF0]"
+        className="flex items-center gap-2 rounded-lg border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-2 text-xs text-cyan-200 transition hover:border-cyan-300/40"
       >
         <span
           className={`h-1.5 w-1.5 rounded-full ${
-            walletConnected ? "bg-[#38A169]" : "bg-[#E09F3E]"
+            walletConnected ? "bg-emerald-400" : "bg-cyan-300"
           }`}
         />
         {walletConnected ? (
           <span className="flex items-center gap-1.5">
-            <span className="text-[#525866]">ETH</span>
-            <span className="text-[#EDEDF0] font-medium">0x7A...91F2</span>
+            <span className="text-zinc-400 font-normal">Connected</span>
+            <span className="font-mono text-cyan-300 font-medium">0x7A...91F2</span>
           </span>
         ) : (
-          <span className="text-[#EDEDF0]">CONNECT_WALLET</span>
+          "Connect Wallet"
         )}
       </button>
 
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="w-full max-w-sm rounded border border-[#232732] bg-[#13151B] p-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[#232732] pb-3">
-              <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[#EDEDF0]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#E09F3E]" />
-                Wallet Session Ledger
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#090d13] p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
+              <h3 className="text-base font-semibold text-white">
+                Wallet Connection
+              </h3>
               <button
                 onClick={() => setModalOpen(false)}
-                className="text-xs font-mono text-[#525866] hover:text-[#EDEDF0] transition"
+                className="text-zinc-500 hover:text-white"
               >
-                [ESC]
+                ✕
               </button>
             </div>
 
-            <div className="py-4">
+            <div className="py-6">
               {walletConnected ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-[#8C93A4]">Status</span>
-                    <span className="inline-flex items-center gap-1.5 text-[#38A169] font-mono text-[11px]">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#38A169]" />
-                      CONNECTED_ACTIVE
-                    </span>
+                <div>
+                  <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                    Demo Wallet Connected
                   </div>
-
-                  <div className="rounded border border-[#1C2029] bg-[#0C0D10] p-2.5">
-                    <div className="text-[10px] font-mono text-[#525866] uppercase">Account Address</div>
-                    <div className="mt-1 font-mono text-xs text-[#EDEDF0] tracking-wide select-all">
-                      0x7A29f3d9b4b029B9057B362F11397858c70491F2
-                    </div>
+                  <div className="mt-2 rounded-xl border border-white/[0.06] bg-black/30 p-3 font-mono text-xs text-zinc-300">
+                    0x7A...91F2
                   </div>
-
-                  <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="text-[#8C93A4]">Escrow Network</span>
-                    <span className="font-mono text-xs text-[#EDEDF0]">Sepolia (11155111)</span>
-                  </div>
+                  <p className="mt-3 text-xs text-zinc-400">
+                    You are connected in demo mode. Full Web3 provider integration will be connected later.
+                  </p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  <p className="text-xs text-[#8C93A4] leading-relaxed">
-                    Connect cryptographic identity to sign findings, claim bounties, or deploy model escrow pools.
+                <div>
+                  <p className="text-sm text-zinc-300 leading-relaxed">
+                    Connect a wallet to continue.
                   </p>
-                  <div className="rounded border border-[#1C2029] bg-[#0C0D10] p-2.5 text-[11px] font-mono text-[#525866]">
-                    SESSION: DEMO_RESEARCHER_KEY
-                  </div>
+                  <p className="mt-2 text-xs text-zinc-500">
+                    For this prototype, you can connect in demo mode as 0x7A...91F2. Real blockchain wallet connections will be enabled during smart contract deployment.
+                  </p>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center justify-end gap-2 border-t border-[#232732] pt-3">
+            <div className="flex items-center justify-end gap-3 border-t border-white/[0.08] pt-4">
               <button
                 onClick={() => setModalOpen(false)}
-                className="rounded border border-[#232732] px-3 py-1.5 text-xs font-mono text-[#8C93A4] hover:text-[#EDEDF0] transition"
+                className="rounded-lg border border-white/[0.08] px-4 py-2 text-xs text-zinc-400 hover:text-white"
               >
-                Dismiss
+                Cancel
               </button>
 
               {walletConnected ? (
                 <button
                   onClick={handleDisconnect}
-                  className="rounded border border-[#D9534F]/30 bg-[#D9534F]/10 px-3 py-1.5 text-xs font-mono font-medium text-[#D9534F] transition hover:bg-[#D9534F]/20"
+                  className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-300 transition hover:bg-red-500/20"
                 >
-                  Disconnect
+                  Disconnect Demo Wallet
                 </button>
               ) : (
                 <button
                   onClick={handleConnect}
-                  className="rounded border border-[#E09F3E]/40 bg-[#E09F3E] px-3.5 py-1.5 text-xs font-mono font-semibold text-[#0C0D10] transition hover:bg-[#EBB052]"
+                  className="rounded-lg bg-cyan-300 px-4 py-2 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200"
                 >
-                  Authorize 0x7A...
+                  Connect Demo Wallet
                 </button>
               )}
             </div>

@@ -8,28 +8,24 @@ import { fetchBounties, fetchDashboardStats, type BackendBounty } from "@/lib/ap
 
 const initialStats = [
   {
-    key: "ACTIVE_BOUNTIES",
     label: "Active Bounties",
     value: "3",
-    sub: "Active verified models",
+    change: "Active campaigns",
   },
   {
-    key: "TOTAL_TESTS",
-    label: "Tests Conducted",
+    label: "Tests Submitted",
     value: "98",
-    sub: "Deterministic stress runs",
+    change: "Independent tests",
   },
   {
-    key: "VERIFIED_ISSUES",
     label: "Verified Findings",
     value: "23",
-    sub: "Confirmed model anomalies",
+    change: "Confirmed issues",
   },
   {
-    key: "ESCROW_DISTRIBUTED",
     label: "Rewards Distributed",
     value: "1.05 ETH",
-    sub: "Released to researchers",
+    change: "Total allocated",
   },
 ];
 
@@ -95,28 +91,24 @@ export default function DashboardPage() {
         if (statsData) {
           setStatsList([
             {
-              key: "ACTIVE_BOUNTIES",
               label: "Active Bounties",
               value: statsData.active_bounties.toString(),
-              sub: `${statsData.total_bounties} registered campaigns`,
+              change: `${statsData.total_bounties} total registered`,
             },
             {
-              key: "TOTAL_TESTS",
-              label: "Tests Conducted",
+              label: "Tests Submitted",
               value: (statsData.total_findings * 4).toString(),
-              sub: `${statsData.total_findings} findings logged`,
+              change: `${statsData.total_findings} findings logged`,
             },
             {
-              key: "VERIFIED_ISSUES",
               label: "Verified Findings",
               value: statsData.approved_findings.toString(),
-              sub: `${statsData.verification_rate} consensus pass rate`,
+              change: `${statsData.verification_rate} verification rate`,
             },
             {
-              key: "ESCROW_DISTRIBUTED",
               label: "Rewards Distributed",
               value: statsData.distributed_rewards,
-              sub: `Pool: ${statsData.total_rewards}`,
+              change: `Pool: ${statsData.total_rewards}`,
             },
           ]);
         }
@@ -132,145 +124,127 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#0C0D10] text-[#EDEDF0]">
+    <main className="min-h-screen bg-[#07090d] text-white">
       <div className="flex min-h-screen">
-        {/* Navigation Sidebar */}
+        {/* Sidebar */}
         <Sidebar />
 
-        {/* Workspace Shell */}
+        {/* Main */}
         <section className="min-w-0 flex-1">
+          {/* Top bar */}
           <Navbar title="Overview" />
 
-          <div className="mx-auto max-w-7xl p-6 lg:p-8 space-y-8">
-            {/* Header Dispatch Banner */}
-            <div className="border border-[#232732] bg-[#13151B] p-6 lg:p-8">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#E09F3E]" />
-                    <span className="text-[10px] font-mono uppercase tracking-[0.16em] text-[#E09F3E]">
-                      AUDIT_LEDGER // DISPATCH_01
-                    </span>
-                  </div>
-                  <h2 className="mt-2 text-2xl font-mono font-medium tracking-tight text-[#EDEDF0]">
-                    AI Model Verification & Escrow Index
-                  </h2>
-                  <p className="mt-1.5 max-w-2xl text-xs text-[#8C93A4] leading-relaxed">
-                    Deterministic stress-testing telemetry across registered machine learning models, active adversarial bounties, and cryptographic validator consensus.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/create-bounty"
-                    className="inline-flex items-center gap-2 rounded border border-[#E09F3E]/40 bg-[#E09F3E] px-4 py-2 text-xs font-mono font-semibold text-[#0C0D10] transition hover:bg-[#EBB052]"
-                  >
-                    <span>+</span>
-                    <span>DEPLOY_BOUNTY</span>
-                  </Link>
-                </div>
+          <div className="mx-auto max-w-7xl p-6 lg:p-8">
+            {/* Welcome */}
+            <div className="mb-8">
+              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                Model Owner
               </div>
+
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+                Your verification overview
+              </h2>
+
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
+                Monitor your AI models, independent tests, verified findings,
+                and bounty activity from one place.
+              </p>
             </div>
 
-            {/* Telemetry Ledger Strip */}
-            <div className="border border-[#232732] bg-[#13151B] grid sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#232732]">
+            {/* Stats */}
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {statsList.map((stat) => (
-                <div key={stat.key} className="p-5 flex flex-col justify-between">
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[#525866] uppercase tracking-wider">
-                    <span>{stat.label}</span>
-                    <span className="text-[#353B4A]">#{stat.key.slice(0, 3)}</span>
-                  </div>
-                  <div className="mt-3 text-2xl font-mono font-medium tracking-tight text-[#EDEDF0] num-tabular">
+                <div
+                  key={stat.label}
+                  className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5"
+                >
+                  <div className="text-xs text-zinc-600">{stat.label}</div>
+
+                  <div className="mt-3 text-2xl font-semibold tracking-tight">
                     {stat.value}
                   </div>
-                  <div className="mt-2 text-[11px] font-mono text-[#8C93A4] truncate">
-                    {stat.sub}
+
+                  <div className="mt-2 text-[11px] text-cyan-300/70">
+                    {stat.change}
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Active Model Bounties Specimen Table */}
-            <div className="border border-[#232732] bg-[#13151B]">
-              <div className="flex items-center justify-between border-b border-[#232732] px-5 py-3.5 bg-[#0F1116]">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-medium text-[#EDEDF0] uppercase tracking-wider">
-                    ACTIVE_SPECIMENS
-                  </span>
-                  <span className="text-[10px] font-mono text-[#525866]">
-                    [{bountyList.length}]
-                  </span>
+            {/* Active Bounties */}
+            <div className="mt-8 overflow-hidden rounded-xl border border-white/[0.06] bg-[#090c11]">
+              <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+                <div>
+                  <h3 className="text-sm font-medium text-white">
+                    Active Bounties
+                  </h3>
+                  <p className="mt-1 text-xs text-zinc-600">
+                    Models currently receiving independent tests
+                  </p>
                 </div>
-                <div className="text-[10px] font-mono text-[#525866] uppercase">
-                  SORT: ESCROW_POOL_DESC
-                </div>
+
+                <Link
+                  href="/create-bounty"
+                  className="rounded-lg bg-cyan-300 px-3 py-2 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200"
+                >
+                  + Create Bounty
+                </Link>
               </div>
 
-              {/* Table Column Labels */}
-              <div className="hidden md:grid grid-cols-[2.5fr_1.5fr_1fr_1fr_1.2fr_auto] gap-4 px-5 py-2.5 border-b border-[#1C2029] text-[10px] font-mono text-[#525866] uppercase tracking-wider bg-[#0C0D10]/50">
-                <div>Model Identifier</div>
-                <div>Domain / Framework</div>
-                <div>Executions</div>
-                <div>Findings</div>
-                <div>Escrow Reward</div>
-                <div className="text-right">Action</div>
-              </div>
-
-              {/* Bounty Rows */}
-              <div className="divide-y divide-[#1C2029]">
+              <div className="divide-y divide-white/[0.05]">
                 {bountyList.map((bounty) => (
                   <Link
                     key={bounty.id || bounty.name}
                     href={`/research-arena?challenge=${bounty.id}`}
-                    className="grid gap-3 px-5 py-4 md:grid-cols-[2.5fr_1.5fr_1fr_1fr_1.2fr_auto] md:items-center cursor-pointer transition hover:bg-[#181B23] group"
+                    className="grid gap-4 px-5 py-5 md:grid-cols-[2fr_1fr_1fr_1fr_auto] md:items-center cursor-pointer transition hover:bg-white/[0.02] group"
                   >
                     <div>
-                      <div className="text-xs font-mono font-medium text-[#EDEDF0] group-hover:text-[#E09F3E] transition-colors">
+                      <div className="text-sm font-medium text-white group-hover:text-cyan-300 transition-colors">
                         {bounty.name}
                       </div>
-                      <div className="text-[10px] font-mono text-[#525866] mt-0.5">
-                        ID: {bounty.id}
+                      <div className="mt-1 text-xs text-zinc-600">
+                        {bounty.type}
                       </div>
                     </div>
 
                     <div>
-                      <span className="inline-block rounded border border-[#232732] bg-[#0C0D10] px-2 py-0.5 text-[10px] font-mono text-[#8C93A4]">
-                        {bounty.type}
-                      </span>
-                    </div>
-
-                    <div className="text-xs font-mono text-[#8C93A4] num-tabular">
-                      <span className="text-[10px] text-[#525866] md:hidden">Tests: </span>
-                      {bounty.tests}
-                    </div>
-
-                    <div className="text-xs font-mono text-[#EDEDF0] num-tabular">
-                      <span className="text-[10px] text-[#525866] md:hidden">Findings: </span>
-                      {bounty.findings}
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
+                        Tests
+                      </div>
+                      <div className="mt-1 text-sm text-zinc-300">
+                        {bounty.tests}
+                      </div>
                     </div>
 
                     <div>
-                      <span className="text-xs font-mono font-medium text-[#E09F3E] num-tabular">
-                        {bounty.reward}
-                      </span>
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
+                        Findings
+                      </div>
+                      <div className="mt-1 text-sm text-zinc-300">
+                        {bounty.findings}
+                      </div>
                     </div>
 
-                    <div className="flex items-center justify-between md:justify-end gap-3">
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
+                        Reward
+                      </div>
+                      <div className="mt-1 text-sm text-zinc-300">
+                        {bounty.reward}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
                       <span
-                        className={`inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10px] font-mono uppercase ${
+                        className={`rounded-full px-2.5 py-1 text-[10px] ${
                           bounty.status === "Testing"
-                            ? "border border-[#E09F3E]/20 bg-[#E09F3E]/10 text-[#E09F3E]"
-                            : "border border-[#8C93A4]/20 bg-[#8C93A4]/10 text-[#8C93A4]"
+                            ? "bg-cyan-300/10 text-cyan-300"
+                            : "bg-yellow-300/10 text-yellow-300"
                         }`}
                       >
-                        <span
-                          className={`h-1 w-1 rounded-full ${
-                            bounty.status === "Testing" ? "bg-[#E09F3E]" : "bg-[#8C93A4]"
-                          }`}
-                        />
                         {bounty.status}
                       </span>
-                      <span className="text-xs font-mono text-[#525866] group-hover:text-[#EDEDF0] group-hover:translate-x-0.5 transition-all">
+                      <span className="text-xs text-cyan-400 group-hover:translate-x-0.5 transition-transform">
                         →
                       </span>
                     </div>
@@ -279,63 +253,55 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Protocol Lifecycle Protocol */}
-            <div className="border border-[#232732] bg-[#13151B] p-6">
-              <div className="border-b border-[#232732] pb-3 mb-6">
-                <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-[#525866]">
-                  SECURITY ARCHITECTURE
-                </div>
-                <h3 className="text-xs font-mono font-medium text-[#EDEDF0] mt-1 uppercase">
-                  End-to-End Verification Pipeline
+            {/* Workflow */}
+            <div className="mt-8 grid gap-4 lg:grid-cols-3">
+              <Link
+                href="/create-bounty"
+                className="rounded-xl border border-white/[0.06] bg-[#090c11] p-6 block transition hover:border-cyan-300/30"
+              >
+                <div className="font-mono text-xs text-cyan-300">01</div>
+
+                <h3 className="mt-5 text-sm font-medium">
+                  Publish your model
                 </h3>
-              </div>
 
-              <div className="grid gap-6 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#232732]">
-                <Link
-                  href="/create-bounty"
-                  className="block group pt-4 md:pt-0 md:pr-6 transition"
-                >
-                  <div className="text-[10px] font-mono text-[#E09F3E]">
-                    PHASE 01 // REGISTRATION
-                  </div>
-                  <h4 className="mt-2 text-xs font-mono font-semibold text-[#EDEDF0] group-hover:text-[#E09F3E] transition-colors">
-                    Model Owner Deposit
-                  </h4>
-                  <p className="mt-1.5 text-xs text-[#8C93A4] leading-relaxed">
-                    Upload weights/endpoints, specify expected behavioral constraints, and lock ETH collateral into the non-custodial smart escrow contract.
-                  </p>
-                </Link>
+                <p className="mt-2 text-xs leading-6 text-zinc-600">
+                  Define the model, expected behavior, testing scope, and
+                  bounty reward.
+                </p>
+              </Link>
 
-                <Link
-                  href="/research-arena"
-                  className="block group pt-4 md:pt-0 md:px-6 transition"
-                >
-                  <div className="text-[10px] font-mono text-[#E09F3E]">
-                    PHASE 02 // ADVERSARIAL STRESS
-                  </div>
-                  <h4 className="mt-2 text-xs font-mono font-semibold text-[#EDEDF0] group-hover:text-[#E09F3E] transition-colors">
-                    Researcher Exploitation
-                  </h4>
-                  <p className="mt-1.5 text-xs text-[#8C93A4] leading-relaxed">
-                    Security researchers formulate boundary inputs and adversarial vectors in the live testing arena, submitting deterministic reproduction traces.
-                  </p>
-                </Link>
+              <Link
+                href="/research-arena"
+                className="rounded-xl border border-white/[0.06] bg-[#090c11] p-6 block transition hover:border-cyan-300/30"
+              >
+                <div className="font-mono text-xs text-cyan-300">02</div>
 
-                <Link
-                  href="/validator"
-                  className="block group pt-4 md:pt-0 md:pl-6 transition"
-                >
-                  <div className="text-[10px] font-mono text-[#E09F3E]">
-                    PHASE 03 // DUAL-LAYER AUDIT
-                  </div>
-                  <h4 className="mt-2 text-xs font-mono font-semibold text-[#EDEDF0] group-hover:text-[#E09F3E] transition-colors">
-                    Consensus & Payout
-                  </h4>
-                  <p className="mt-1.5 text-xs text-[#8C93A4] leading-relaxed">
-                    Validators execute local model inference (scikit-learn) and Groq LLM impact triage. Verified issues trigger cryptographic reward release.
-                  </p>
-                </Link>
-              </div>
+                <h3 className="mt-5 text-sm font-medium">
+                  Researchers challenge it
+                </h3>
+
+                <p className="mt-2 text-xs leading-6 text-zinc-600">
+                  Independent researchers submit inputs designed to expose
+                  unexpected model behavior.
+                </p>
+              </Link>
+
+              <Link
+                href="/validator"
+                className="rounded-xl border border-white/[0.06] bg-[#090c11] p-6 block transition hover:border-cyan-300/30"
+              >
+                <div className="font-mono text-xs text-cyan-300">03</div>
+
+                <h3 className="mt-5 text-sm font-medium">
+                  Findings get verified
+                </h3>
+
+                <p className="mt-2 text-xs leading-6 text-zinc-600">
+                  Reproduction and independent validation determine whether a
+                  submitted finding is legitimate.
+                </p>
+              </Link>
             </div>
           </div>
         </section>
