@@ -46,16 +46,20 @@ def main():
 
     def shutdown(sig=None, frame=None):
         print("\nStopping ModelBounty servers...")
+        for proc in [frontend_proc, backend_proc]:
+            try:
+                proc.terminate()
+            except Exception:
+                pass
+        time.sleep(0.5)
         for proc, name in [(frontend_proc, "Frontend"), (backend_proc, "Backend")]:
             try:
-                if is_windows:
+                if is_windows and proc.poll() is None:
                     subprocess.call(
                         ["taskkill", "/F", "/T", "/PID", str(proc.pid)],
                         stdout=subprocess.DEVNULL,
                         stderr=subprocess.DEVNULL,
                     )
-                else:
-                    proc.terminate()
             except Exception:
                 pass
         print("✓ Both servers stopped cleanly.")
