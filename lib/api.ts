@@ -1,5 +1,6 @@
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== "undefined" ? "/api" : "http://127.0.0.1:8000/api");
 
 export interface AIAnalysisDetails {
   severity: string;
@@ -53,6 +54,193 @@ export interface BackendFinding {
   researcher_name?: string;
 }
 
+export interface BackendBounty {
+  id: string;
+  title: string;
+  description: string;
+  model_name: string;
+  model_version: string;
+  category: string;
+  reward: string;
+  status: "ACTIVE" | "PAUSED" | "COMPLETED" | "CANCELLED" | string;
+  expected_behavior?: string | null;
+  testing_requirements?: string | null;
+  owner_id: string;
+  created_at: string;
+  updated_at: string;
+  finding_count: number;
+}
+
+export interface CreateBountyPayload {
+  title: string;
+  description: string;
+  model_name: string;
+  model_version?: string;
+  category: string;
+  reward: string;
+  expected_behavior?: string;
+  testing_requirements?: string;
+  owner_id?: string;
+}
+
+export interface CreateFindingPayload {
+  bounty_id: string;
+  researcher_id?: string;
+  finding_title: string;
+  severity: string;
+  what_happened: string;
+  evidence: string;
+  reproduction_steps: string;
+  expected_behavior?: string;
+  actual_behavior?: string;
+  reward?: string;
+}
+
+export interface DashboardStatsData {
+  active_bounties: number;
+  total_bounties: number;
+  total_findings: number;
+  pending_findings: number;
+  approved_findings: number;
+  rejected_findings: number;
+  total_rewards: string;
+  distributed_rewards: string;
+  verification_rate: string;
+}
+
+// --- Dashboard Functions ---
+export async function fetchDashboardStats(): Promise<DashboardStatsData | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/dashboard/stats`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+// --- Bounty Functions ---
+export async function fetchBounties(): Promise<BackendBounty[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/bounties`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchBountyById(bountyId: string): Promise<BackendBounty | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/bounties/${encodeURIComponent(bountyId)}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function createBounty(payload: CreateBountyPayload): Promise<BackendBounty> {
+  const body = {
+    title: payload.title,
+    description: payload.description,
+    model_name: payload.model_name,
+    model_version: payload.model_version || "1.0.0",
+    category: payload.category,
+    reward: payload.reward,
+    status: "ACTIVE",
+    expected_behavior: payload.expected_behavior || "",
+    testing_requirements: payload.testing_requirements || "",
+    owner_id: payload.owner_id || "user-owner",
+  };
+
+  const res = await fetch(`${API_BASE_URL}/bounties`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errJson = await res.json().catch(() => ({}));
+    throw new Error(errJson.detail || `Failed to create bounty (${res.status})`);
+  }
+
+  return await res.json();
+}
+
+// --- Finding Submission Functions ---
+export async function submitFinding(payload: CreateFindingPayload): Promise<BackendFinding> {
+  const body = {
+    bounty_id: payload.bounty_id,
+    researcher_id: payload.researcher_id || "user-researcher",
+    finding_title: payload.finding_title,
+    severity: payload.severity.toUpperCase(),
+    what_happened: payload.what_happened,
+    evidence: payload.evidence,
+    reproduction_steps: payload.reproduction_steps,
+    expected_behavior: payload.expected_behavior || "Expected normal model output",
+    actual_behavior: payload.actual_behavior || payload.what_happened,
+    reward: payload.reward || "0.50 ETH",
+  };
+
+  const res = await fetch(`${API_BASE_URL}/findings`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errJson = await res.json().catch(() => ({}));
+    throw new Error(errJson.detail || `Failed to submit finding (${res.status})`);
+  }
+
+  return await res.json();
+}
+
+// --- Findings Query Functions ---
+export async function getBackendFindings(): Promise<BackendFinding[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/findings`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+export const fetchFindings = getBackendFindings;
+
+export async function getFindingById(findingId: string): Promise<BackendFinding | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/findings/${encodeURIComponent(findingId)}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+// --- AI Analysis Functions ---
 export async function getAIAnalysis(findingId: string): Promise<AIAnalysisResponse> {
   let res: Response;
   try {
@@ -163,34 +351,6 @@ export async function runAIAnalysis(findingId: string): Promise<AIAnalysisRespon
   }
 
   return data;
-}
-
-export async function getBackendFindings(): Promise<BackendFinding[]> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/findings`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    return await res.json();
-  } catch {
-    return [];
-  }
-}
-
-export async function getFindingById(findingId: string): Promise<BackendFinding | null> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/findings/${encodeURIComponent(findingId)}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  }
 }
 
 // --- ML Model Interfaces & Functions ---
@@ -436,4 +596,3 @@ export async function getRewards(): Promise<unknown[]> {
     return [];
   }
 }
-

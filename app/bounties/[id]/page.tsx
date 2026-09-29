@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { bounties, type Bounty } from "@/lib/data";
+import { bounties as staticBounties, type Bounty } from "@/lib/data";
+import { fetchBountyById, fetchBounties, type BackendBounty } from "@/lib/api";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 
@@ -12,20 +13,88 @@ export default function BountyDetailPage() {
   const id = typeof params?.id === "string" ? params.id : "";
 
   const [bounty, setBounty] = useState<Bounty | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
-    const found = bounties.find(
-      (b) =>
-        b.id === id ||
-        b.model.toLowerCase().replace(/\s+/g, "-") === id.toLowerCase()
-    );
-    if (found) {
-      setBounty(found);
+    let isMounted = true;
+
+    async function loadBounty() {
+      // 1. Check static data first for fast load
+      const staticFound = staticBounties.find(
+        (b) =>
+          b.id === id ||
+          b.model.toLowerCase().replace(/\s+/g, "-") === id.toLowerCase()
+      );
+      if (staticFound && isMounted) {
+        setBounty(staticFound);
+      }
+
+      // 2. Fetch from backend API
+      try {
+        const backendBounty: BackendBounty | null = await fetchBountyById(id);
+        if (backendBounty && isMounted) {
+          const mapped: Bounty = {
+            id: backendBounty.id,
+            model: backendBounty.title || backendBounty.model_name,
+            category: backendBounty.category,
+            description: backendBounty.description,
+            tests: backendBounty.finding_count ? backendBounty.finding_count * 4 : 20,
+            findings: backendBounty.finding_count || 0,
+            reward: backendBounty.reward,
+            status: (backendBounty.status === "ACTIVE" ? "Testing" : backendBounty.status === "PAUSED" ? "Review" : "Closed") as "Testing" | "Review" | "Closed",
+            expectedBehaviour: backendBounty.expected_behavior || "Expected normal model behavior",
+            testingRequirements: backendBounty.testing_requirements ? backendBounty.testing_requirements.split("\n") : [
+              "Test boundary parameters and edge cases.",
+              "Document reproducible evidence of misbehavior."
+            ],
+          };
+          setBounty(mapped);
+          setLoading(false);
+          return;
+        }
+
+        // 3. If not found by direct ID, search all backend bounties
+        const allBounties = await fetchBounties();
+        const foundInAll = allBounties.find(
+          (b) =>
+            b.id === id ||
+            (b.title && b.title.toLowerCase().replace(/\s+/g, "-") === id.toLowerCase()) ||
+            (b.model_name && b.model_name.toLowerCase().replace(/\s+/g, "-") === id.toLowerCase())
+        );
+
+        if (foundInAll && isMounted) {
+          const mapped: Bounty = {
+            id: foundInAll.id,
+            model: foundInAll.title || foundInAll.model_name,
+            category: foundInAll.category,
+            description: foundInAll.description,
+            tests: foundInAll.finding_count ? foundInAll.finding_count * 4 : 20,
+            findings: foundInAll.finding_count || 0,
+            reward: foundInAll.reward,
+            status: (foundInAll.status === "ACTIVE" ? "Testing" : foundInAll.status === "PAUSED" ? "Review" : "Closed") as "Testing" | "Review" | "Closed",
+            expectedBehaviour: foundInAll.expected_behavior || "Expected normal model behavior",
+            testingRequirements: foundInAll.testing_requirements ? foundInAll.testing_requirements.split("\n") : [
+              "Test boundary parameters and edge cases.",
+              "Document reproducible evidence of misbehavior."
+            ],
+          };
+          setBounty(mapped);
+        }
+      } catch {
+        // Fallback already assigned
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     }
+
+    loadBounty();
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
-  if (!bounty) {
+  if (!bounty && !loading) {
     return (
       <main className="min-h-screen bg-[#07090d] text-white flex items-center justify-center p-6">
         <div className="max-w-md rounded-2xl border border-white/[0.06] bg-[#090c11] p-8 text-center">
@@ -45,6 +114,14 @@ export default function BountyDetailPage() {
             </Link>
           </div>
         </div>
+      </main>
+    );
+  }
+
+  if (!bounty) {
+    return (
+      <main className="min-h-screen bg-[#07090d] text-white flex items-center justify-center p-6">
+        <div className="text-xs text-zinc-500">Loading bounty details...</div>
       </main>
     );
   }

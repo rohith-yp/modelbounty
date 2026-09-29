@@ -1,34 +1,37 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+import { fetchBounties, fetchDashboardStats, type BackendBounty } from "@/lib/api";
 
-const stats = [
+const initialStats = [
   {
     label: "Active Bounties",
-    value: "12",
-    change: "+3 this week",
+    value: "3",
+    change: "Active campaigns",
   },
   {
     label: "Tests Submitted",
-    value: "148",
-    change: "+24 today",
+    value: "98",
+    change: "Independent tests",
   },
   {
     label: "Verified Findings",
-    value: "37",
-    change: "91% verification rate",
+    value: "23",
+    change: "Confirmed issues",
   },
   {
     label: "Rewards Distributed",
-    value: "2.84 ETH",
-    change: "Across 37 findings",
+    value: "1.05 ETH",
+    change: "Total allocated",
   },
 ];
 
-const bounties = [
+const initialBounties = [
   {
+    id: "fraud-detect-v1",
     name: "FraudDetect V1",
     type: "Fraud Detection",
     status: "Testing",
@@ -37,6 +40,7 @@ const bounties = [
     reward: "0.50 ETH",
   },
   {
+    id: "health-risk-classifier",
     name: "HealthRisk Classifier",
     type: "Healthcare ML",
     status: "Testing",
@@ -45,6 +49,7 @@ const bounties = [
     reward: "0.35 ETH",
   },
   {
+    id: "support-intent-ai",
     name: "SupportIntent AI",
     type: "NLP",
     status: "Review",
@@ -54,13 +59,70 @@ const bounties = [
   },
 ];
 
-const bountySlugMap: Record<string, string> = {
-  "FraudDetect V1": "fraud-detect-v1",
-  "HealthRisk Classifier": "health-risk-classifier",
-  "SupportIntent AI": "support-intent-ai",
-};
-
 export default function DashboardPage() {
+  const [bountyList, setBountyList] = useState(initialBounties);
+  const [statsList, setStatsList] = useState(initialStats);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadData() {
+      try {
+        const [bountiesData, statsData] = await Promise.all([
+          fetchBounties(),
+          fetchDashboardStats(),
+        ]);
+
+        if (!isMounted) return;
+
+        if (bountiesData && bountiesData.length > 0) {
+          const mapped = bountiesData.map((b: BackendBounty) => ({
+            id: b.id,
+            name: b.title || b.model_name,
+            type: b.category,
+            status: b.status === "ACTIVE" ? "Testing" : b.status === "PAUSED" ? "Review" : "Closed",
+            tests: b.finding_count ? b.finding_count * 4 : 12,
+            findings: b.finding_count || 0,
+            reward: b.reward,
+          }));
+          setBountyList(mapped);
+        }
+
+        if (statsData) {
+          setStatsList([
+            {
+              label: "Active Bounties",
+              value: statsData.active_bounties.toString(),
+              change: `${statsData.total_bounties} total registered`,
+            },
+            {
+              label: "Tests Submitted",
+              value: (statsData.total_findings * 4).toString(),
+              change: `${statsData.total_findings} findings logged`,
+            },
+            {
+              label: "Verified Findings",
+              value: statsData.approved_findings.toString(),
+              change: `${statsData.verification_rate} verification rate`,
+            },
+            {
+              label: "Rewards Distributed",
+              value: statsData.distributed_rewards,
+              change: `Pool: ${statsData.total_rewards}`,
+            },
+          ]);
+        }
+      } catch {
+        // Retain initial state
+      }
+    }
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <main className="min-h-screen bg-[#07090d] text-white">
       <div className="flex min-h-screen">
@@ -91,7 +153,7 @@ export default function DashboardPage() {
 
             {/* Stats */}
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {stats.map((stat) => (
+              {statsList.map((stat) => (
                 <div
                   key={stat.label}
                   className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5"
@@ -130,70 +192,64 @@ export default function DashboardPage() {
               </div>
 
               <div className="divide-y divide-white/[0.05]">
-                {bounties.map((bounty) => {
-                  const bountySlug =
-                    bountySlugMap[bounty.name] ||
-                    bounty.name.toLowerCase().replace(/\s+/g, "-");
-
-                  return (
-                    <Link
-                      key={bounty.name}
-                      href={`/research-arena?challenge=${bountySlug}`}
-                      className="grid gap-4 px-5 py-5 md:grid-cols-[2fr_1fr_1fr_1fr_auto] md:items-center cursor-pointer transition hover:bg-white/[0.02] group"
-                    >
-                      <div>
-                        <div className="text-sm font-medium text-white group-hover:text-cyan-300 transition-colors">
-                          {bounty.name}
-                        </div>
-                        <div className="mt-1 text-xs text-zinc-600">
-                          {bounty.type}
-                        </div>
+                {bountyList.map((bounty) => (
+                  <Link
+                    key={bounty.id || bounty.name}
+                    href={`/research-arena?challenge=${bounty.id}`}
+                    className="grid gap-4 px-5 py-5 md:grid-cols-[2fr_1fr_1fr_1fr_auto] md:items-center cursor-pointer transition hover:bg-white/[0.02] group"
+                  >
+                    <div>
+                      <div className="text-sm font-medium text-white group-hover:text-cyan-300 transition-colors">
+                        {bounty.name}
                       </div>
-
-                      <div>
-                        <div className="text-[10px] uppercase tracking-wider text-zinc-600">
-                          Tests
-                        </div>
-                        <div className="mt-1 text-sm text-zinc-300">
-                          {bounty.tests}
-                        </div>
+                      <div className="mt-1 text-xs text-zinc-600">
+                        {bounty.type}
                       </div>
+                    </div>
 
-                      <div>
-                        <div className="text-[10px] uppercase tracking-wider text-zinc-600">
-                          Findings
-                        </div>
-                        <div className="mt-1 text-sm text-zinc-300">
-                          {bounty.findings}
-                        </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
+                        Tests
                       </div>
+                      <div className="mt-1 text-sm text-zinc-300">
+                        {bounty.tests}
+                      </div>
+                    </div>
 
-                      <div>
-                        <div className="text-[10px] uppercase tracking-wider text-zinc-600">
-                          Reward
-                        </div>
-                        <div className="mt-1 text-sm text-zinc-300">
-                          {bounty.reward}
-                        </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
+                        Findings
                       </div>
+                      <div className="mt-1 text-sm text-zinc-300">
+                        {bounty.findings}
+                      </div>
+                    </div>
 
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-[10px] ${
-                            bounty.status === "Testing"
-                              ? "bg-cyan-300/10 text-cyan-300"
-                              : "bg-yellow-300/10 text-yellow-300"
-                          }`}
-                        >
-                          {bounty.status}
-                        </span>
-                        <span className="text-xs text-cyan-400 group-hover:translate-x-0.5 transition-transform">
-                          →
-                        </span>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
+                        Reward
                       </div>
-                    </Link>
-                  );
-                })}
+                      <div className="mt-1 text-sm text-zinc-300">
+                        {bounty.reward}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-[10px] ${
+                          bounty.status === "Testing"
+                            ? "bg-cyan-300/10 text-cyan-300"
+                            : "bg-yellow-300/10 text-yellow-300"
+                        }`}
+                      >
+                        {bounty.status}
+                      </span>
+                      <span className="text-xs text-cyan-400 group-hover:translate-x-0.5 transition-transform">
+                        →
+                      </span>
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
 

@@ -3,8 +3,9 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { bounties, type Bounty, type Severity, type Submission } from "@/lib/data";
+import { bounties as staticBounties, type Bounty, type Severity, type Submission } from "@/lib/data";
 import { addSubmission } from "@/lib/store";
+import { fetchBounties, submitFinding, type BackendBounty } from "@/lib/api";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 
@@ -12,6 +13,7 @@ function ResearchArenaContent() {
   const searchParams = useSearchParams();
   const challengeQuery = searchParams.get("challenge");
 
+  const [bountyList, setBountyList] = useState<Bounty[]>(staticBounties);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedBounty, setSelectedBounty] = useState<Bounty | null>(null);
@@ -23,13 +25,39 @@ function ResearchArenaContent() {
   const [evidence, setEvidence] = useState("");
   const [reproductionSteps, setReproductionSteps] = useState("");
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
 
-  const categories = ["All", "Fraud Detection", "Healthcare ML", "NLP"];
+  const categories = ["All", "Fraud Detection", "Healthcare ML", "NLP", "Machine Learning", "Computer Vision"];
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchBounties().then((data: BackendBounty[]) => {
+      if (isMounted && data && data.length > 0) {
+        const mapped: Bounty[] = data.map((b) => ({
+          id: b.id,
+          model: b.title || b.model_name,
+          category: b.category,
+          description: b.description,
+          tests: b.finding_count ? b.finding_count * 4 : 20,
+          findings: b.finding_count || 0,
+          reward: b.reward,
+          status: (b.status === "ACTIVE" ? "Testing" : b.status === "PAUSED" ? "Review" : "Closed") as "Testing" | "Review" | "Closed",
+          expectedBehaviour: b.expected_behavior || "Expected normal model output under benchmark test conditions",
+          testingRequirements: b.testing_requirements ? b.testing_requirements.split("\n") : [],
+        }));
+        setBountyList(mapped);
+      }
+    }).catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (challengeQuery) {
-      const found = bounties.find(
+      const found = bountyList.find(
         (b) =>
           b.id === challengeQuery ||
           b.model.toLowerCase().replace(/\s+/g, "-") ===
@@ -39,9 +67,9 @@ function ResearchArenaContent() {
         setSelectedBounty(found);
       }
     }
-  }, [challengeQuery]);
+  }, [challengeQuery, bountyList]);
 
-  const filteredBounties = bounties.filter((b) => {
+  const filteredBounties = bountyList.filter((b) => {
     const matchesSearch =
       b.model.toLowerCase().includes(search.toLowerCase()) ||
       b.category.toLowerCase().includes(search.toLowerCase()) ||
@@ -62,7 +90,7 @@ function ResearchArenaContent() {
     setFormError("");
   }
 
-  function handleFindingSubmit(e: React.FormEvent) {
+  async function handleFindingSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!selectedBounty) return;
 
@@ -83,26 +111,48 @@ function ResearchArenaContent() {
       return;
     }
 
-    const newSubmission: Submission = {
-      id: `submission-${Date.now().toString().slice(-4)}`,
-      bountyId: selectedBounty.id,
-      model: selectedBounty.model,
-      finding: findingTitle.trim(),
-      title: findingTitle.trim(),
-      description: whatHappened.trim(),
-      evidence: evidence.trim(),
-      reproduction: reproductionSteps.trim(),
-      category: selectedBounty.category,
-      severity,
-      status: "Pending",
-      reward: selectedBounty.reward,
-      researcher: "0x7A...91F2",
-      submitted: "Just now",
-    };
-
-    addSubmission(newSubmission);
-    setSubmittedSuccess(true);
+    setIsSubmitting(true);
     setFormError("");
+
+    try {
+      const createdFinding = await submitFinding({
+        bounty_id: selectedBounty.id,
+        researcher_id: "user-researcher",
+        finding_title: findingTitle.trim(),
+        severity: severity.toUpperCase(),
+        what_happened: whatHappened.trim(),
+        evidence: evidence.trim(),
+        reproduction_steps: reproductionSteps.trim(),
+        expected_behavior: selectedBounty.expectedBehaviour,
+        actual_behavior: whatHappened.trim(),
+        reward: selectedBounty.reward,
+      });
+
+      const newSubmission: Submission = {
+        id: createdFinding.id || `submission-${Date.now().toString().slice(-4)}`,
+        bountyId: selectedBounty.id,
+        model: selectedBounty.model,
+        finding: findingTitle.trim(),
+        title: findingTitle.trim(),
+        description: whatHappened.trim(),
+        evidence: evidence.trim(),
+        reproduction: reproductionSteps.trim(),
+        category: selectedBounty.category,
+        severity,
+        status: "Pending",
+        reward: selectedBounty.reward,
+        researcher: "0x7A...91F2",
+        submitted: "Just now",
+      };
+
+      addSubmission(newSubmission);
+      setSubmittedSuccess(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to record finding to backend.";
+      setFormError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -359,9 +409,10 @@ function ResearchArenaContent() {
                   </button>
                   <button
                     type="submit"
-                    className="rounded-lg bg-cyan-300 px-5 py-2 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200"
+                    disabled={isSubmitting}
+                    className="rounded-lg bg-cyan-300 px-5 py-2 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200 disabled:opacity-50"
                   >
-                    Submit Finding →
+                    {isSubmitting ? "Submitting..." : "Submit Finding →"}
                   </button>
                 </div>
               </form>
@@ -386,4 +437,3 @@ export default function ResearchArenaPage() {
     </Suspense>
   );
 }
-

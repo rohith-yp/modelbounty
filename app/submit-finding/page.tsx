@@ -1,26 +1,23 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { Severity } from "@/lib/data";
-import { bounties } from "@/lib/data";
+import { bounties as initialStaticBounties } from "@/lib/data";
 import { addSubmission } from "@/lib/store";
+import { fetchBounties, submitFinding, type BackendBounty } from "@/lib/api";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 
 export default function SubmitFindingPage() {
-  const router = useRouter();
-
-  const [selectedBountyId, setSelectedBountyId] =
-    useState("fraud-detect-v1");
+  const [bountyList, setBountyList] = useState(initialStaticBounties);
+  const [selectedBountyId, setSelectedBountyId] = useState("fraud-detect-v1");
 
   const [finding, setFinding] = useState(
     "Fraudulent transaction missed under unusual amount pattern"
   );
 
-  const [severity, setSeverity] =
-    useState<Severity>("High");
+  const [severity, setSeverity] = useState<Severity>("High");
 
   const [whatHappened, setWhatHappened] = useState(
     "The FraudDetect V1 model classified a transaction as legitimate even though the transaction contained an unusually high amount pattern that should have triggered fraud detection. The model failed to identify the transaction as potentially fraudulent."
@@ -35,13 +32,39 @@ export default function SubmitFindingPage() {
   );
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const selectedBounty =
-    bounties.find((bounty) => bounty.id === selectedBountyId) ??
-    bounties[0];
+  useEffect(() => {
+    let isMounted = true;
+    fetchBounties().then((data: BackendBounty[]) => {
+      if (isMounted && data && data.length > 0) {
+        const mapped = data.map((b) => ({
+          id: b.id,
+          model: b.title || b.model_name,
+          category: b.category,
+          description: b.description,
+          tests: b.finding_count ? b.finding_count * 4 : 20,
+          findings: b.finding_count || 0,
+          reward: b.reward,
+          status: (b.status === "ACTIVE" ? "Testing" : b.status === "PAUSED" ? "Review" : "Closed") as "Testing" | "Review" | "Closed",
+          expectedBehaviour: b.expected_behavior || "Expected normal model behavior",
+          testingRequirements: b.testing_requirements ? b.testing_requirements.split("\n") : [],
+        }));
+        setBountyList(mapped);
+      }
+    }).catch(() => {});
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const selectedBounty =
+    bountyList.find((bounty) => bounty.id === selectedBountyId) ??
+    bountyList[0];
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!finding.trim()) {
@@ -65,26 +88,50 @@ export default function SubmitFindingPage() {
     }
 
     setErrorMessage("");
+    setIsSubmitting(true);
 
-    const newSubmission = {
-      id: `submission-${Date.now().toString().slice(-4)}`,
-      bountyId: selectedBounty.id,
-      model: selectedBounty.model,
-      finding: finding.trim(),
-      title: finding.trim(),
-      description: whatHappened.trim(),
-      evidence: evidence.trim(),
-      reproduction: reproductionSteps.trim(),
-      category: selectedBounty.category,
-      severity,
-      status: "Pending" as const,
-      reward: selectedBounty.reward,
-      researcher: "0x7A...91F2",
-      submitted: "Just now",
-    };
+    try {
+      const createdFinding = await submitFinding({
+        bounty_id: selectedBounty.id,
+        researcher_id: "user-researcher",
+        finding_title: finding.trim(),
+        severity: severity.toUpperCase(),
+        what_happened: whatHappened.trim(),
+        evidence: evidence.trim(),
+        reproduction_steps: reproductionSteps.trim(),
+        expected_behavior: selectedBounty.expectedBehaviour,
+        actual_behavior: whatHappened.trim(),
+        reward: selectedBounty.reward,
+      });
 
-    addSubmission(newSubmission);
-    setSubmitted(true);
+      const newSubmission = {
+        id: createdFinding.id || `submission-${Date.now().toString().slice(-4)}`,
+        bountyId: selectedBounty.id,
+        model: selectedBounty.model,
+        finding: finding.trim(),
+        title: finding.trim(),
+        description: whatHappened.trim(),
+        evidence: evidence.trim(),
+        reproduction: reproductionSteps.trim(),
+        category: selectedBounty.category,
+        severity,
+        status: "Pending" as const,
+        reward: selectedBounty.reward,
+        researcher: "0x7A...91F2",
+        submitted: "Just now",
+      };
+
+      addSubmission(newSubmission);
+      setSubmitted(true);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to submit finding to backend. Please check network.";
+      setErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -163,7 +210,7 @@ export default function SubmitFindingPage() {
                       onChange={(e) => setSelectedBountyId(e.target.value)}
                       className="w-full rounded-xl border border-white/[0.08] bg-[#0d1219] px-4 py-2.5 text-sm text-white focus:border-cyan-400/50 focus:outline-none"
                     >
-                      {bounties.map((b) => (
+                      {bountyList.map((b) => (
                         <option key={b.id} value={b.id}>
                           {b.model} ({b.reward})
                         </option>
@@ -254,9 +301,10 @@ export default function SubmitFindingPage() {
 
                   <button
                     type="submit"
-                    className="rounded-lg bg-cyan-300 px-5 py-2.5 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200"
+                    disabled={isSubmitting}
+                    className="rounded-lg bg-cyan-300 px-5 py-2.5 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200 disabled:opacity-50"
                   >
-                    Submit Finding to Validators →
+                    {isSubmitting ? "Submitting..." : "Submit Finding to Validators →"}
                   </button>
                 </div>
               </form>

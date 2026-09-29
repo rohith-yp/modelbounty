@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+import { fetchBounties, fetchDashboardStats, type BackendBounty, type DashboardStatsData } from "@/lib/api";
 
-const bounties = [
+const initialBounties = [
   {
+    id: "fraud-detect-v1",
     name: "FraudDetect V1",
     category: "Fraud Detection",
     tests: 48,
@@ -14,6 +17,7 @@ const bounties = [
     status: "Testing",
   },
   {
+    id: "health-risk-classifier",
     name: "HealthRisk Classifier",
     category: "Healthcare ML",
     tests: 31,
@@ -22,6 +26,7 @@ const bounties = [
     status: "Testing",
   },
   {
+    id: "support-intent-ai",
     name: "SupportIntent AI",
     category: "NLP",
     tests: 19,
@@ -31,13 +36,54 @@ const bounties = [
   },
 ];
 
-const bountySlugMap: Record<string, string> = {
-  "FraudDetect V1": "fraud-detect-v1",
-  "HealthRisk Classifier": "health-risk-classifier",
-  "SupportIntent AI": "support-intent-ai",
-};
-
 export default function MyBountiesPage() {
+  const [bountyList, setBountyList] = useState(initialBounties);
+  const [stats, setStats] = useState<DashboardStatsData | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadData() {
+      try {
+        const [bountiesData, statsData] = await Promise.all([
+          fetchBounties(),
+          fetchDashboardStats(),
+        ]);
+
+        if (!isMounted) return;
+
+        if (bountiesData && bountiesData.length > 0) {
+          const mapped = bountiesData.map((b: BackendBounty) => ({
+            id: b.id,
+            name: b.title || b.model_name,
+            category: b.category,
+            tests: b.finding_count ? b.finding_count * 4 : 12,
+            findings: b.finding_count || 0,
+            reward: b.reward,
+            status: b.status === "ACTIVE" ? "Testing" : b.status === "PAUSED" ? "Review" : "Closed",
+          }));
+          setBountyList(mapped);
+        }
+
+        if (statsData) {
+          setStats(statsData);
+        }
+      } catch {
+        // Keep fallback data if fetch fails
+      }
+    }
+
+    loadData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const activeCount = stats?.active_bounties ?? bountyList.filter((b) => b.status === "Testing").length;
+  const verifiedFindings = stats?.approved_findings ?? bountyList.reduce((acc, b) => acc + b.findings, 0);
+  const totalRewardPool = stats?.total_rewards ?? "1.05 ETH";
+  const totalTests = stats?.total_findings ? stats.total_findings * 4 : 98;
+
   return (
     <main className="min-h-screen bg-[#07090d] text-white">
       <div className="flex min-h-screen">
@@ -76,7 +122,7 @@ export default function MyBountiesPage() {
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 mb-8">
               <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5">
                 <div className="text-xs text-zinc-600">Active Bounties</div>
-                <div className="mt-3 text-2xl font-semibold">3</div>
+                <div className="mt-3 text-2xl font-semibold">{activeCount}</div>
                 <div className="mt-2 text-[11px] text-cyan-300/70">
                   Published models
                 </div>
@@ -84,7 +130,7 @@ export default function MyBountiesPage() {
 
               <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5">
                 <div className="text-xs text-zinc-600">Total Tests</div>
-                <div className="mt-3 text-2xl font-semibold">98</div>
+                <div className="mt-3 text-2xl font-semibold">{totalTests}</div>
                 <div className="mt-2 text-[11px] text-zinc-500">
                   Stress tests run
                 </div>
@@ -92,7 +138,7 @@ export default function MyBountiesPage() {
 
               <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5">
                 <div className="text-xs text-zinc-600">Verified Findings</div>
-                <div className="mt-3 text-2xl font-semibold">23</div>
+                <div className="mt-3 text-2xl font-semibold">{verifiedFindings}</div>
                 <div className="mt-2 text-[11px] text-emerald-400">
                   Confirmed model issues
                 </div>
@@ -101,7 +147,7 @@ export default function MyBountiesPage() {
               <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5">
                 <div className="text-xs text-zinc-600">Bounty Rewards</div>
                 <div className="mt-3 text-2xl font-semibold text-cyan-300">
-                  1.05 ETH
+                  {totalRewardPool}
                 </div>
                 <div className="mt-2 text-[11px] text-zinc-500">
                   Allocated pool
@@ -121,75 +167,69 @@ export default function MyBountiesPage() {
               </div>
 
               <div className="divide-y divide-white/[0.05]">
-                {bounties.map((bounty) => {
-                  const slug =
-                    bountySlugMap[bounty.name] ||
-                    bounty.name.toLowerCase().replace(/\s+/g, "-");
-
-                  return (
-                    <div
-                      key={bounty.name}
-                      className="grid gap-4 px-5 py-5 md:grid-cols-[2fr_1fr_1fr_1fr_auto_auto] md:items-center"
-                    >
-                      <div>
-                        <div className="text-sm font-medium text-white">
-                          {bounty.name}
-                        </div>
-                        <div className="mt-1 text-xs text-zinc-600">
-                          {bounty.category}
-                        </div>
+                {bountyList.map((bounty) => (
+                  <div
+                    key={bounty.id || bounty.name}
+                    className="grid gap-4 px-5 py-5 md:grid-cols-[2fr_1fr_1fr_1fr_auto_auto] md:items-center"
+                  >
+                    <div>
+                      <div className="text-sm font-medium text-white">
+                        {bounty.name}
                       </div>
-
-                      <div>
-                        <div className="text-[10px] uppercase tracking-wider text-zinc-600">
-                          Tests
-                        </div>
-                        <div className="mt-1 text-sm text-zinc-300">
-                          {bounty.tests}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-[10px] uppercase tracking-wider text-zinc-600">
-                          Findings
-                        </div>
-                        <div className="mt-1 text-sm text-zinc-300">
-                          {bounty.findings}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-[10px] uppercase tracking-wider text-zinc-600">
-                          Reward
-                        </div>
-                        <div className="mt-1 text-sm text-zinc-300">
-                          {bounty.reward}
-                        </div>
-                      </div>
-
-                      <div>
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-[10px] ${
-                            bounty.status === "Testing"
-                              ? "bg-cyan-300/10 text-cyan-300"
-                              : "bg-yellow-300/10 text-yellow-300"
-                          }`}
-                        >
-                          {bounty.status}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/research-arena?challenge=${slug}`}
-                          className="rounded-lg bg-cyan-300 px-3 py-1.5 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200"
-                        >
-                          Challenge Model →
-                        </Link>
+                      <div className="mt-1 text-xs text-zinc-600">
+                        {bounty.category}
                       </div>
                     </div>
-                  );
-                })}
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
+                        Tests
+                      </div>
+                      <div className="mt-1 text-sm text-zinc-300">
+                        {bounty.tests}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
+                        Findings
+                      </div>
+                      <div className="mt-1 text-sm text-zinc-300">
+                        {bounty.findings}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
+                        Reward
+                      </div>
+                      <div className="mt-1 text-sm text-zinc-300">
+                        {bounty.reward}
+                      </div>
+                    </div>
+
+                    <div>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-[10px] ${
+                          bounty.status === "Testing"
+                            ? "bg-cyan-300/10 text-cyan-300"
+                            : "bg-yellow-300/10 text-yellow-300"
+                        }`}
+                      >
+                        {bounty.status}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/research-arena?challenge=${bounty.id}`}
+                        className="rounded-lg bg-cyan-300 px-3 py-1.5 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200"
+                      >
+                        Challenge Model →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

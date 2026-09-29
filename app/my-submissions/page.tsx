@@ -2,28 +2,86 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { Submission } from "@/lib/data";
+import type { Severity, Submission, SubmissionStatus } from "@/lib/data";
 import { getStoredSubmissions } from "@/lib/store";
+import { getBackendFindings, type BackendFinding } from "@/lib/api";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+
+function formatSeverity(sev: string): Severity {
+  const s = (sev || "").toUpperCase();
+  if (s === "CRITICAL") return "Critical";
+  if (s === "HIGH") return "High";
+  if (s === "LOW") return "Low";
+  return "Medium";
+}
+
+function formatStatus(stat: string): SubmissionStatus {
+  const s = (stat || "").toUpperCase();
+  if (s === "APPROVED") return "Approved";
+  if (s === "REJECTED") return "Rejected";
+  return "Pending";
+}
 
 export default function MySubmissionsPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
-  function loadSubmissions() {
-    setSubmissions(getStoredSubmissions());
-  }
-
   useEffect(() => {
-    loadSubmissions();
+    let isMounted = true;
+
+    async function loadAllSubmissions() {
+      const localSubs = getStoredSubmissions();
+      try {
+        const backendFindings = await getBackendFindings();
+        if (!isMounted) return;
+
+        if (backendFindings && backendFindings.length > 0) {
+          const mapped: Submission[] = backendFindings.map((bf: BackendFinding) => ({
+            id: bf.id,
+            bountyId: bf.bounty_id,
+            model: bf.model_name || bf.bounty_title || "FraudDetect V1",
+            finding: bf.finding_title,
+            title: bf.finding_title,
+            category: bf.bounty_title?.toLowerCase().includes("health")
+              ? "Healthcare ML"
+              : bf.bounty_title?.toLowerCase().includes("support")
+              ? "NLP"
+              : "Fraud Detection",
+            severity: formatSeverity(bf.severity),
+            status: formatStatus(bf.status),
+            reward: bf.reward || "0.50 ETH",
+            researcher: bf.researcher_name || "0x7A...91F2",
+            submitted: bf.created_at ? new Date(bf.created_at).toLocaleDateString() : "Recently",
+            description: bf.what_happened,
+            evidence: bf.evidence,
+            reproduction: bf.reproduction_steps,
+          }));
+
+          // Merge backend findings with any recent local submissions (deduping by id)
+          const seenIds = new Set(mapped.map((m) => m.id));
+          const uniqueLocal = localSubs.filter((l) => !seenIds.has(l.id));
+          setSubmissions([...uniqueLocal, ...mapped]);
+          return;
+        }
+      } catch {
+        // Fall back to local
+      }
+
+      if (isMounted) {
+        setSubmissions(localSubs);
+      }
+    }
+
+    loadAllSubmissions();
 
     const handleUpdate = () => {
-      loadSubmissions();
+      loadAllSubmissions();
     };
 
     window.addEventListener("modelbounty-submissions-updated", handleUpdate);
     window.addEventListener("storage", handleUpdate);
     return () => {
+      isMounted = false;
       window.removeEventListener("modelbounty-submissions-updated", handleUpdate);
       window.removeEventListener("storage", handleUpdate);
     };

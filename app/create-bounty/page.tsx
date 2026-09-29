@@ -4,9 +4,12 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
+import { createBounty } from "@/lib/api";
 
 export default function CreateBountyPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [form, setForm] = useState({
     modelName: "",
@@ -25,9 +28,38 @@ export default function CreateBountyPage() {
     }));
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+    setErrorMsg("");
+
+    try {
+      const rewardFormatted = form.reward.trim().toUpperCase().endsWith("ETH")
+        ? form.reward.trim()
+        : `${form.reward.trim()} ETH`;
+
+      await createBounty({
+        title: form.modelName.trim(),
+        model_name: form.modelName.trim(),
+        model_version: "1.0.0",
+        category: form.modelType,
+        reward: rewardFormatted,
+        description: form.description.trim(),
+        expected_behavior: form.expectedBehavior.trim(),
+        testing_requirements: form.testingScope.trim(),
+        owner_id: "user-owner",
+      });
+
+      setSubmitted(true);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Failed to publish bounty. Please ensure the backend is connected.";
+      setErrorMsg(message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -95,6 +127,12 @@ export default function CreateBountyPage() {
                 onSubmit={handleSubmit}
                 className="space-y-6 rounded-2xl border border-white/[0.06] bg-[#090c11] p-6 lg:p-8"
               >
+                {errorMsg && (
+                  <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300">
+                    {errorMsg}
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-2">
                     Model Name
@@ -198,9 +236,10 @@ export default function CreateBountyPage() {
 
                   <button
                     type="submit"
-                    className="rounded-lg bg-cyan-300 px-5 py-2.5 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200"
+                    disabled={loading}
+                    className="rounded-lg bg-cyan-300 px-5 py-2.5 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200 disabled:opacity-50"
                   >
-                    Deploy Bounty Campaign →
+                    {loading ? "Deploying..." : "Deploy Bounty Campaign →"}
                   </button>
                 </div>
               </form>
