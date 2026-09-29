@@ -283,15 +283,17 @@ def get_ai_analysis_endpoint(
     history: bool = Query(False),
     db: Session = Depends(get_db),
 ):
-    from backend.models import Finding, AIAnalysis
-    finding = db.query(Finding).filter(Finding.id == finding_id).first()
+    from backend.models import AIAnalysis
+    finding = finding_service.get_finding(db, finding_id)
     if not finding:
         raise HTTPException(status_code=404, detail=f"Finding '{finding_id}' not found")
+
+    resolved_id = finding.id
 
     if history:
         analyses = (
             db.query(AIAnalysis)
-            .filter(AIAnalysis.finding_id == finding_id)
+            .filter((AIAnalysis.finding_id == resolved_id) | (AIAnalysis.finding_id == finding_id))
             .order_by(AIAnalysis.created_at.asc())
             .all()
         )
@@ -299,7 +301,7 @@ def get_ai_analysis_endpoint(
 
     analysis = (
         db.query(AIAnalysis)
-        .filter(AIAnalysis.finding_id == finding_id)
+        .filter((AIAnalysis.finding_id == resolved_id) | (AIAnalysis.finding_id == finding_id))
         .order_by(AIAnalysis.created_at.desc())
         .first()
     )
@@ -334,14 +336,13 @@ def run_ai_analysis_endpoint(
     finding_id: str,
     db: Session = Depends(get_db),
 ):
-    from backend.models import Finding
     from backend.services.ai_service import AIService
-    finding = db.query(Finding).filter(Finding.id == finding_id).first()
+    finding = finding_service.get_finding(db, finding_id)
     if not finding:
         raise HTTPException(status_code=404, detail=f"Finding '{finding_id}' not found")
 
     try:
-        analysis_record = AIService.analyze_finding(db, finding_id)
+        analysis_record = AIService.analyze_finding(db, finding.id)
     except Exception as exc:
         msg = str(exc)
         if "rate limit" in msg.lower():

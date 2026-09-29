@@ -135,43 +135,52 @@ export default function SubmitFindingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#07090d] text-white">
+    <main className="min-h-screen bg-[#0C0D10] text-[#EDEDF0]">
       <div className="flex min-h-screen">
         <Sidebar />
 
         <section className="min-w-0 flex-1">
-          <Navbar title="Submit Finding" />
+          <Navbar title="Submit Specimen" />
 
           <div className="mx-auto max-w-4xl p-6 lg:p-8">
-            <div className="mb-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
-                Researcher Workspace
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-                Submit Independent Finding
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-zinc-500">
-                Document reproducible model misclassification or boundary failure to submit to the validation pool.
+            {/* Header Telemetry */}
+            <div className="border-b border-[#232732] pb-6">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase">
+                  01 // RESEARCHER WORKSPACE // SPECIMEN INGESTION
+                </span>
+                <span className="inline-block h-1 w-1 rounded-full bg-[#E09F3E]" />
+                <span className="font-mono text-[10px] text-zinc-500 uppercase">
+                  EVIDENCE ATTESTATION
+                </span>
+              </div>
+
+              <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                Submit Model Vulnerability Specimen
+              </h1>
+
+              <p className="mt-1 text-xs text-zinc-400">
+                Document reproducible model misclassification or boundary failure to register in the consensus validation pool for peer attestation and escrow release.
               </p>
             </div>
 
             {submitted ? (
-              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-8 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 text-xl font-bold">
+              <div className="mt-8 border border-emerald-500/30 bg-[#13151B] p-8 text-center">
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded border border-emerald-500/40 bg-emerald-500/10 font-mono text-emerald-400 text-lg font-bold">
                   ✓
                 </div>
-                <h3 className="mt-4 text-xl font-bold text-white">
-                  Finding Successfully Submitted
-                </h3>
-                <p className="mt-2 text-sm text-zinc-400 max-w-md mx-auto">
-                  Your finding has been registered under status{" "}
-                  <span className="text-yellow-400 font-semibold">Pending Validation</span>. Validators will review the execution trace against expected specifications.
+                <h2 className="mt-4 text-base font-semibold text-white">
+                  Finding Specimen Successfully Registered
+                </h2>
+                <p className="mt-2 text-xs text-zinc-400 max-w-lg mx-auto leading-relaxed">
+                  Your finding has been persisted to the consensus ledger under status{" "}
+                  <span className="text-[#E09F3E] font-mono font-semibold">PENDING_VALIDATION</span>. Consensus validators will execute inference against the target specification.
                 </p>
 
-                <div className="mt-6 flex items-center justify-center gap-4">
+                <div className="mt-6 flex items-center justify-center gap-3 font-mono text-xs">
                   <Link
                     href="/my-submissions"
-                    className="rounded-lg bg-cyan-300 px-4 py-2 text-xs font-semibold text-[#061014] hover:bg-cyan-200 transition"
+                    className="rounded border border-[#E09F3E] bg-[#E09F3E] px-4 py-2 font-semibold text-black hover:bg-[#E09F3E]/90 transition"
                   >
                     View My Submissions →
                   </Link>
@@ -183,118 +192,144 @@ export default function SubmitFindingPage() {
                       setEvidence("");
                       setReproductionSteps("");
                     }}
-                    className="rounded-lg border border-white/[0.08] px-4 py-2 text-xs text-zinc-400 hover:text-white transition"
+                    className="rounded border border-[#232732] bg-[#0C0D10] px-4 py-2 text-zinc-300 hover:text-white transition"
                   >
-                    Submit Another Finding
+                    Submit Another Specimen
                   </button>
                 </div>
               </div>
             ) : (
               <form
                 onSubmit={handleSubmit}
-                className="space-y-6 rounded-2xl border border-white/[0.06] bg-[#090c11] p-6 lg:p-8"
+                className="mt-8 space-y-6 border border-[#232732] bg-[#13151B] p-6 lg:p-8"
               >
                 {errorMessage && (
-                  <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-xs text-red-300">
-                    {errorMessage}
+                  <div className="border border-red-500/30 bg-red-950/20 p-4 font-mono text-xs text-red-300">
+                    ERROR: {errorMessage}
                   </div>
                 )}
 
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <div>
-                    <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-2">
-                      Target Bounty Model
-                    </label>
-                    <select
-                      value={selectedBountyId}
-                      onChange={(e) => setSelectedBountyId(e.target.value)}
-                      className="w-full rounded-xl border border-white/[0.08] bg-[#0d1219] px-4 py-2.5 text-sm text-white focus:border-cyan-400/50 focus:outline-none"
-                    >
-                      {bountyList.map((b) => (
-                        <option key={b.id} value={b.id}>
-                          {b.model} ({b.reward})
-                        </option>
-                      ))}
-                    </select>
+                {/* Section 02: Model & Severity Parameters */}
+                <div>
+                  <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase block mb-3">
+                    02 // TARGET & SEVERITY PARAMETERS
+                  </span>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="block font-mono text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5">
+                        Target Bounty Model
+                      </label>
+                      <select
+                        value={selectedBountyId}
+                        onChange={(e) => setSelectedBountyId(e.target.value)}
+                        className="w-full rounded border border-[#232732] bg-[#0C0D10] px-3.5 py-2.5 font-mono text-xs text-zinc-200 focus:border-[#E09F3E] focus:outline-none"
+                      >
+                        {bountyList.map((b) => (
+                          <option key={b.id} value={b.id}>
+                            {b.model} — Reward: {b.reward}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-mono text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5">
+                        Severity Tier
+                      </label>
+                      <select
+                        value={severity}
+                        onChange={(e) => setSeverity(e.target.value as Severity)}
+                        className="w-full rounded border border-[#232732] bg-[#0C0D10] px-3.5 py-2.5 font-mono text-xs text-zinc-200 focus:border-[#E09F3E] focus:outline-none"
+                      >
+                        <option value="Low">Low — Minor heuristic drift</option>
+                        <option value="Medium">Medium — Reproducible misclassification</option>
+                        <option value="High">High — Threshold evasion / false negative</option>
+                        <option value="Critical">Critical — Complete pipeline compromise</option>
+                      </select>
+                    </div>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-2">
-                      Severity Tier
-                    </label>
-                    <select
-                      value={severity}
-                      onChange={(e) => setSeverity(e.target.value as Severity)}
-                      className="w-full rounded-xl border border-white/[0.08] bg-[#0d1219] px-4 py-2.5 text-sm text-white focus:border-cyan-400/50 focus:outline-none"
-                    >
-                      <option value="Low">Low</option>
-                      <option value="Medium">Medium</option>
-                      <option value="High">High</option>
-                      <option value="Critical">Critical</option>
-                    </select>
+                {/* Section 03: Specimen Observation */}
+                <div className="border-t border-[#232732] pt-6">
+                  <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase block mb-3">
+                    03 // SPECIMEN TITLE & OBSERVATION
+                  </span>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block font-mono text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5">
+                        Finding Title
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={finding}
+                        onChange={(e) => setFinding(e.target.value)}
+                        placeholder="Short summary of the bug or misclassification"
+                        className="w-full rounded border border-[#232732] bg-[#0C0D10] px-3.5 py-2.5 text-xs text-white placeholder-zinc-600 focus:border-[#E09F3E] focus:outline-none font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-mono text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5">
+                        What Happened (Observed Behavior vs Specification)
+                      </label>
+                      <textarea
+                        rows={3}
+                        required
+                        value={whatHappened}
+                        onChange={(e) => setWhatHappened(e.target.value)}
+                        placeholder="Describe how the model performed versus its expected behavior..."
+                        className="w-full rounded border border-[#232732] bg-[#0C0D10] px-3.5 py-2.5 text-xs text-zinc-300 placeholder-zinc-600 focus:border-[#E09F3E] focus:outline-none leading-relaxed"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-2">
-                    Finding Title
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={finding}
-                    onChange={(e) => setFinding(e.target.value)}
-                    placeholder="Short summary of the bug or misclassification"
-                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-cyan-400/50 focus:outline-none"
-                  />
+                {/* Section 04: Evidence & Reproduction */}
+                <div className="border-t border-[#232732] pt-6">
+                  <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase block mb-3">
+                    04 // EVIDENCE VECTOR & REPRODUCTION PROTOCOL
+                  </span>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block font-mono text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5">
+                        Evidence Vector & Payload Parameters
+                      </label>
+                      <textarea
+                        rows={4}
+                        required
+                        value={evidence}
+                        onChange={(e) => setEvidence(e.target.value)}
+                        placeholder="Input vectors, API payload parameters, and returned outputs..."
+                        className="w-full rounded border border-[#232732] bg-[#0C0D10] p-3 text-xs text-zinc-300 placeholder-zinc-600 focus:border-[#E09F3E] focus:outline-none font-mono leading-relaxed"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-mono text-[11px] uppercase tracking-wider text-zinc-400 mb-1.5">
+                        Deterministic Reproduction Steps
+                      </label>
+                      <textarea
+                        rows={4}
+                        required
+                        value={reproductionSteps}
+                        onChange={(e) => setReproductionSteps(e.target.value)}
+                        placeholder="Deterministic steps for a validator to reproduce this result..."
+                        className="w-full rounded border border-[#232732] bg-[#0C0D10] p-3 text-xs text-zinc-300 placeholder-zinc-600 focus:border-[#E09F3E] focus:outline-none font-mono leading-relaxed"
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-2">
-                    What Happened (Observed Behavior)
-                  </label>
-                  <textarea
-                    rows={3}
-                    required
-                    value={whatHappened}
-                    onChange={(e) => setWhatHappened(e.target.value)}
-                    placeholder="Describe how the model performed versus its expected behavior..."
-                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-cyan-400/50 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-2">
-                    Evidence & Payload
-                  </label>
-                  <textarea
-                    rows={4}
-                    required
-                    value={evidence}
-                    onChange={(e) => setEvidence(e.target.value)}
-                    placeholder="Input vectors, API payload parameters, and returned outputs..."
-                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-cyan-400/50 focus:outline-none font-mono text-xs"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium uppercase tracking-wider text-zinc-400 mb-2">
-                    Reproduction Steps
-                  </label>
-                  <textarea
-                    rows={4}
-                    required
-                    value={reproductionSteps}
-                    onChange={(e) => setReproductionSteps(e.target.value)}
-                    placeholder="Deterministic steps for a validator to reproduce this result..."
-                    className="w-full rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-cyan-400/50 focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex items-center justify-end gap-3 border-t border-white/[0.06] pt-6">
+                {/* Actions Toolbar */}
+                <div className="flex items-center justify-between border-t border-[#232732] pt-6">
                   <Link
                     href="/research-arena"
-                    className="rounded-lg border border-white/[0.08] px-4 py-2 text-xs text-zinc-400 hover:text-white transition"
+                    className="rounded border border-[#232732] bg-[#0C0D10] px-4 py-2 font-mono text-xs text-zinc-400 hover:text-white transition"
                   >
                     Cancel
                   </Link>
@@ -302,9 +337,10 @@ export default function SubmitFindingPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="rounded-lg bg-cyan-300 px-5 py-2.5 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200 disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded border border-[#E09F3E] bg-[#E09F3E] px-5 py-2.5 font-mono text-xs font-semibold text-black transition hover:bg-[#E09F3E]/90 disabled:opacity-50"
                   >
-                    {isSubmitting ? "Submitting..." : "Submit Finding to Validators →"}
+                    <span>{isSubmitting ? "TRANSMITTING TO LEDGER..." : "SUBMIT SPECIMEN TO VALIDATORS"}</span>
+                    <span>→</span>
                   </button>
                 </div>
               </form>

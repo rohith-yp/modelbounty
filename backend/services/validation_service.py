@@ -19,7 +19,8 @@ def approve_finding(
     comment: Optional[str] = None
 ) -> Finding:
     # 1. Find finding
-    finding = db.query(Finding).filter(Finding.id == finding_id).first()
+    from backend.services.finding_service import get_finding
+    finding = get_finding(db, finding_id)
     if not finding:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -83,7 +84,8 @@ def reject_finding(
     comment: Optional[str] = None
 ) -> Finding:
     # 1. Find finding
-    finding = db.query(Finding).filter(Finding.id == finding_id).first()
+    from backend.services.finding_service import get_finding
+    finding = get_finding(db, finding_id)
     if not finding:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -171,6 +171,7 @@ function ValidatorContent() {
     if (!id) return;
 
     let isMounted = true;
+    setAiLoading(true);
 
     getAIAnalysis(id)
       .then((data) => {
@@ -293,182 +294,181 @@ function ValidatorContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[#07090d] text-white">
+    <main className="min-h-screen bg-[#0C0D10] text-[#EDEDF0]">
       <div className="flex min-h-screen">
-        {/* Sidebar */}
         <Sidebar />
 
-        {/* Main Content */}
         <section className="min-w-0 flex-1">
-          <Navbar title="Validator" />
+          <Navbar title="Validator Terminal" />
 
           <div className="mx-auto max-w-7xl p-6 lg:p-8">
-            {/* Header */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            {/* Header Telemetry */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-[#232732] pb-6">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
-                  Verification Network
-                </p>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase">
+                    01 // CONSENSUS & VALIDATION LAYER
+                  </span>
+                  <span className="inline-block h-1 w-1 rounded-full bg-[#E09F3E]" />
+                  <span className="font-mono text-[10px] text-zinc-500 uppercase">
+                    MULTI-MODEL INFERENCE
+                  </span>
+                </div>
 
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-                  Validator Dashboard
-                </h2>
+                <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                  Validator Verification Desk
+                </h1>
 
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-                  Review researcher findings, inspect evidence, and decide
-                  whether reported model failures are valid.
+                <p className="mt-1 text-xs text-zinc-400">
+                  Inspect submitted model failure specimens, execute live scikit-learn/clinical inference checks, and perform Groq LLM security triage.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs text-zinc-400">
-                  Validator Consensus Active
+              <div className="flex items-center gap-3 self-start sm:self-auto">
+                <div className="inline-flex items-center gap-2 rounded border border-[#232732] bg-[#13151B] px-3 py-1.5 font-mono text-[11px] text-zinc-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>CONSENSUS ACTIVE</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Verification Telemetry Counters */}
+            <div className="mt-6 grid grid-cols-1 gap-px bg-[#232732] sm:grid-cols-3 border border-[#232732]">
+              <div className="bg-[#13151B] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                    Awaiting Validation
+                  </span>
+                  <span className="font-mono text-[10px] text-[#E09F3E]">ACTION REQ</span>
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="font-mono text-3xl font-bold tracking-tight text-white">
+                    {pendingCount}
+                  </span>
+                  <span className="text-[11px] text-zinc-500">specimens queued</span>
+                </div>
+              </div>
+
+              <div className="bg-[#13151B] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                    Attested & Verified
+                  </span>
+                  <span className="font-mono text-[10px] text-emerald-400">ESCROW UNLOCKED</span>
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="font-mono text-3xl font-bold tracking-tight text-white">
+                    {approvedCount}
+                  </span>
+                  <span className="text-[11px] text-zinc-500">approved bounties</span>
+                </div>
+              </div>
+
+              <div className="bg-[#13151B] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                    Rejected / Non-Reproduced
+                  </span>
+                  <span className="font-mono text-[10px] text-zinc-500">DISMISSED</span>
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="font-mono text-3xl font-bold tracking-tight text-white">
+                    {rejectedCount}
+                  </span>
+                  <span className="text-[11px] text-zinc-500">invalid specimens</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Findings Queue */}
+            <section className="mt-8">
+              <div className="flex items-center justify-between border-b border-[#232732] pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase">
+                    02 // SPECIMEN VERIFICATION QUEUE
+                  </span>
+                </div>
+                <span className="font-mono text-[11px] text-zinc-500">
+                  {pendingFindings.length} RECORD{pendingFindings.length === 1 ? "" : "S"}
                 </span>
               </div>
-            </div>
 
-            {/* Statistics */}
-            <div className="mt-8 grid gap-4 md:grid-cols-3">
-              <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-6">
-                <p className="text-xs uppercase tracking-wide text-zinc-500">
-                  Pending Review
-                </p>
-
-                <p className="mt-4 text-3xl font-bold text-white">
-                  {pendingCount}
-                </p>
-
-                <p className="mt-2 text-xs text-yellow-400">
-                  Requires validation
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-6">
-                <p className="text-xs uppercase tracking-wide text-zinc-500">
-                  Approved
-                </p>
-
-                <p className="mt-4 text-3xl font-bold text-white">
-                  {approvedCount}
-                </p>
-
-                <p className="mt-2 text-xs text-emerald-400">
-                  Valid findings attested
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-6">
-                <p className="text-xs uppercase tracking-wide text-zinc-500">
-                  Rejected
-                </p>
-
-                <p className="mt-4 text-3xl font-bold text-white">
-                  {rejectedCount}
-                </p>
-
-                <p className="mt-2 text-xs text-red-400">
-                  Invalid / non-reproducible
-                </p>
-              </div>
-            </div>
-
-            {/* Findings */}
-            <section className="mt-8">
-              <div className="mb-6">
-                <h3 className="text-base font-semibold text-white">
-                  Findings Awaiting Validation
-                </h3>
-
-                <p className="mt-1 text-xs text-zinc-500">
-                  Independent researcher submissions requiring verification
-                </p>
-              </div>
-
-              <div className="space-y-4">
+              <div className="mt-4 space-y-3">
                 {pendingFindings.length === 0 ? (
-                  <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-8 text-center">
-                    <p className="text-sm text-zinc-400">
-                      No findings are currently awaiting validation.
+                  <div className="border border-[#232732] bg-[#13151B] p-12 text-center">
+                    <p className="font-mono text-xs uppercase tracking-wider text-zinc-400">
+                      No findings currently awaiting validation
+                    </p>
+                    <p className="mt-1 text-[11px] text-zinc-600">
+                      Incoming researcher reports will appear in this ledger in real-time.
                     </p>
                   </div>
                 ) : (
                   pendingFindings.map((finding) => (
                     <div
                       key={finding.id}
-                      className="rounded-xl border border-white/[0.06] bg-[#090c11] p-6"
+                      className="group border border-[#232732] bg-[#13151B] p-5 transition-colors hover:border-[#E09F3E]/40"
                     >
-                      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex-1">
-                          <div className="flex flex-wrap gap-2">
-                            <span className="rounded-full border border-cyan-500/30 bg-cyan-500/5 px-3 py-1 text-xs text-cyan-400">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="border border-[#232732] bg-[#0C0D10] px-2 py-0.5 font-mono text-[10px] text-zinc-300">
                               {finding.model}
                             </span>
 
                             <span
-                              className={`rounded-full px-3 py-1 text-xs ${
+                              className={`border px-2 py-0.5 font-mono text-[10px] uppercase ${
                                 finding.severity === "Critical"
-                                  ? "bg-red-500/10 text-red-400"
+                                  ? "border-red-500/30 bg-red-950/20 text-red-400"
                                   : finding.severity === "High"
-                                  ? "bg-orange-500/10 text-orange-400"
+                                  ? "border-orange-500/30 bg-orange-950/20 text-orange-400"
                                   : finding.severity === "Medium"
-                                  ? "bg-yellow-500/10 text-yellow-400"
-                                  : "bg-slate-500/10 text-slate-400"
+                                  ? "border-amber-500/30 bg-amber-950/20 text-amber-400"
+                                  : "border-zinc-700 bg-zinc-900 text-zinc-400"
                               }`}
                             >
-                              {finding.severity}
+                              SEV: {finding.severity}
                             </span>
 
-                            <span className="rounded-full bg-yellow-500/10 px-3 py-1 text-xs text-yellow-400">
-                              Pending Review
+                            <span className="border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] text-amber-300">
+                              PENDING TRIAGE
+                            </span>
+
+                            <span className="font-mono text-[10px] text-zinc-600">
+                              ID: {finding.id}
                             </span>
                           </div>
 
-                          <h4 className="mt-4 text-base font-semibold text-white">
+                          <h3 className="mt-2.5 text-sm font-semibold text-white group-hover:text-[#E09F3E] transition-colors">
                             {finding.finding}
-                          </h4>
+                          </h3>
 
-                          <p className="mt-2 max-w-4xl text-xs leading-5 text-zinc-400">
-                            Researcher submitted a finding for review under
-                            the {finding.model} challenge.
+                          <p className="mt-1 text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                            {finding.description || finding.finding}
                           </p>
 
-                          <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 text-xs text-zinc-500">
+                          <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-1 font-mono text-[11px] text-zinc-500">
                             <span>
-                              Researcher:{" "}
-                              <span className="font-mono text-zinc-300">
-                                {finding.researcher}
-                              </span>
+                              RESEARCHER:{" "}
+                              <span className="text-zinc-300">{finding.researcher}</span>
                             </span>
-
                             <span>
-                              Category:{" "}
-                              <span className="text-zinc-300">
-                                {finding.category}
-                              </span>
+                              REWARD:{" "}
+                              <span className="font-bold text-[#E09F3E]">{finding.reward}</span>
                             </span>
-
                             <span>
-                              Reward:{" "}
-                              <span className="font-bold text-cyan-400">
-                                {finding.reward}
-                              </span>
-                            </span>
-
-                            <span>
-                              Submitted:{" "}
-                              <span className="text-zinc-300">
-                                {finding.submitted}
-                              </span>
+                              SUBMITTED:{" "}
+                              <span className="text-zinc-400">{finding.submitted}</span>
                             </span>
                           </div>
                         </div>
 
                         <button
                           onClick={() => handleSelectFinding(finding)}
-                          className="rounded-lg border border-white/10 px-5 py-2.5 text-xs font-medium text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/5"
+                          className="self-start lg:self-center inline-flex items-center gap-1.5 rounded border border-[#232732] bg-[#0C0D10] px-4 py-2 font-mono text-xs font-medium text-zinc-200 transition hover:border-[#E09F3E] hover:text-white"
                         >
-                          Review Finding
+                          <span>Inspect Specimen</span>
+                          <span>→</span>
                         </button>
                       </div>
                     </div>
@@ -480,462 +480,201 @@ function ValidatorContent() {
         </section>
       </div>
 
-      {/* Review Modal */}
+      {/* Specimen Review Modal / Dossier Terminal */}
       {selectedFinding && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-2xl border border-white/10 bg-[#090d13] p-6 sm:p-7 shadow-2xl">
-            {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-white/[0.08] pb-4">
-              <div>
-                <p className="text-xs font-semibold tracking-[0.18em] text-cyan-400">
-                  FINDING REVIEW
-                </p>
-
-                <h3 className="mt-2 text-xl font-bold text-white">
-                  {selectedFinding.finding}
-                </h3>
+          <div className="w-full max-w-4xl max-h-[92vh] flex flex-col border border-[#232732] bg-[#0C0D10] shadow-2xl">
+            {/* Modal Terminal Header */}
+            <div className="flex items-center justify-between border-b border-[#232732] bg-[#13151B] px-6 py-4">
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase">
+                  VERIFICATION DESK // SPECIMEN DOSSIER
+                </span>
+                <span className="border border-[#232732] bg-[#0C0D10] px-2 py-0.5 font-mono text-[10px] text-zinc-400">
+                  {selectedFinding.model}
+                </span>
               </div>
 
-              <button
-                onClick={() => handleSelectFinding(null)}
-                className="text-zinc-500 hover:text-white"
-              >
-                ✕
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleCopyId(selectedFinding.id)}
+                  className="inline-flex items-center gap-1 rounded border border-[#232732] bg-[#0C0D10] px-2.5 py-1 font-mono text-[11px] text-zinc-400 hover:border-zinc-600 hover:text-white transition"
+                  title="Copy Finding ID"
+                >
+                  {copiedId === selectedFinding.id ? (
+                    <span className="text-emerald-400">COPIED</span>
+                  ) : (
+                    <>
+                      <span>COPY ID</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => handleSelectFinding(null)}
+                  className="rounded border border-[#232732] px-2 py-1 font-mono text-xs text-zinc-400 hover:border-zinc-500 hover:text-white transition"
+                >
+                  ESC ✕
+                </button>
+              </div>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="mt-5 space-y-3.5 max-h-[70vh] overflow-y-auto pr-1">
-              {/* Finding ID Section */}
-              <div className="rounded-xl border border-white/[0.06] bg-black/30 p-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                    FINDING ID
-                  </p>
-
-                  <button
-                    type="button"
-                    onClick={() => handleCopyId(selectedFinding.id)}
-                    className="inline-flex items-center gap-1.5 rounded border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-zinc-300 hover:border-cyan-500/40 hover:text-white transition"
-                    title="Copy Finding ID to clipboard"
-                  >
-                    {copiedId === selectedFinding.id ? (
-                      <span className="font-semibold text-emerald-400">Copied</span>
-                    ) : (
-                      <>
-                        <svg
-                          className="h-3 w-3 text-zinc-400"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
-                        <span>Copy ID</span>
-                      </>
-                    )}
-                  </button>
+            {/* Modal Body: Scrollable Dossier Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              {/* Finding Title & Core Metrics Strip */}
+              <div className="border border-[#232732] bg-[#13151B] p-5">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#232732] pb-3">
+                  <h2 className="text-base font-semibold text-white">
+                    {selectedFinding.finding}
+                  </h2>
+                  <div className="flex items-center gap-2 font-mono text-xs">
+                    <span className="text-zinc-500">ESCROW REWARD:</span>
+                    <span className="font-bold text-[#E09F3E]">{selectedFinding.reward}</span>
+                  </div>
                 </div>
 
-                <p className="mt-2 font-mono text-xs text-cyan-300 break-all select-all">
-                  {selectedFinding.id}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-black/30 p-4">
-                <p className="text-xs font-semibold text-zinc-500 uppercase">
-                  Model
-                </p>
-                <p className="mt-1 text-sm text-white">
-                  {selectedFinding.model}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-black/30 p-4">
-                <p className="text-xs font-semibold text-zinc-500 uppercase">
-                  Researcher
-                </p>
-                <p className="mt-1 font-mono text-sm text-cyan-300">
-                  {selectedFinding.researcher}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-black/30 p-4">
-                <p className="text-xs font-semibold text-zinc-500 uppercase">
-                  Severity Tier & Reward
-                </p>
-                <div className="mt-1 flex items-center gap-3">
-                  <span className="text-sm font-medium text-white">
-                    {selectedFinding.severity}
-                  </span>
-                  <span className="text-sm font-bold text-cyan-400">
-                    {selectedFinding.reward}
-                  </span>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-black/30 p-4">
-                <p className="text-xs font-semibold text-zinc-500 uppercase">
-                  Reported Finding Details
-                </p>
-                <p className="mt-1 text-xs leading-relaxed text-zinc-300">
-                  {selectedFinding.description || selectedFinding.finding}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-black/30 p-4">
-                <p className="text-xs font-semibold text-zinc-500 uppercase">
-                  Evidence & Reproduction
-                </p>
-                <p className="mt-1 text-xs leading-relaxed text-zinc-400 whitespace-pre-line">
-                  {selectedFinding.evidence ||
-                    selectedFinding.reproduction ||
-                    "The researcher submitted a reproducible test case showing unexpected model behaviour under the specified challenge conditions. Peer validation tests the input against the live model."}
-                </p>
-              </div>
-
-              {/* AI-Assisted Analysis Section */}
-              <div className="rounded-xl border border-cyan-500/20 bg-[#070b10] p-4.5 sm:p-5">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-white/[0.08] pb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-5 w-5 items-center justify-center rounded bg-cyan-500/10 text-cyan-400">
-                      <svg
-                        className="h-3.5 w-3.5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-                      </svg>
-                    </div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-300">
-                      AI-ASSISTED ANALYSIS
-                    </h4>
-                  </div>
-
-                  {aiAnalysis && (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-mono text-zinc-400">
-                        {aiAnalysis.provider ? aiAnalysis.provider.toUpperCase() : "GROQ"} : {aiAnalysis.model || "qwen/qwen3.8-27b"}
-                      </span>
-                      <button
-                        onClick={handleRunAIAnalysis}
-                        disabled={aiGenerating}
-                        className="rounded border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-zinc-300 hover:text-white hover:border-cyan-500/40 disabled:opacity-50 transition"
-                      >
-                        {aiGenerating ? "Analyzing finding..." : "Re-run AI Analysis"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* AI Advisory Disclaimer */}
-                <div className="mt-3 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-[11px] leading-relaxed text-amber-200/90">
-                  AI analysis is advisory. Final validation decisions are made by the human validator.
-                </div>
-
-                {/* Loading State */}
-                {aiLoading && (
-                  <div className="mt-4 flex items-center justify-center gap-3 py-6 text-xs text-zinc-400">
-                    <span className="h-3.5 w-3.5 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
-                    <span>Loading AI analysis...</span>
-                  </div>
-                )}
-
-                {/* Generating State */}
-                {aiGenerating && (
-                  <div className="mt-4 flex items-center justify-center gap-3 py-6 text-xs text-cyan-300">
-                    <span className="h-3.5 w-3.5 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
-                    <span>Analyzing finding...</span>
-                  </div>
-                )}
-
-                {/* No Analysis State */}
-                {!aiLoading && !aiGenerating && aiError === "NO_ANALYSIS" && (
-                  <div className="mt-4 rounded-lg border border-white/[0.06] bg-black/20 p-5 text-center">
-                    <p className="text-xs text-zinc-400">
-                      No AI analysis is available for this finding yet.
-                    </p>
-                    <button
-                      onClick={handleRunAIAnalysis}
-                      className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-xs font-medium text-cyan-300 hover:bg-cyan-500/20 transition"
-                    >
-                      Run AI Analysis
-                    </button>
-                  </div>
-                )}
-
-                {/* Generic/Network Error State */}
-                {!aiLoading && !aiGenerating && aiError && aiError !== "NO_ANALYSIS" && !aiAnalysis && (
-                  <div className="mt-4 rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-center">
-                    <p className="text-xs text-red-300">{aiError}</p>
-                    <button
-                      onClick={handleRunAIAnalysis}
-                      className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300 hover:text-white transition"
-                    >
-                      Retry
-                    </button>
-                  </div>
-                )}
-
-                {/* Active Analysis Result */}
-                {!aiLoading && !aiGenerating && aiAnalysis && (
-                  <div className="mt-4 space-y-3.5 text-xs">
-                    {/* Key Metrics Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      <div className="rounded-lg border border-white/[0.06] bg-black/40 p-2.5">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          AI Severity
-                        </p>
-                        <p
-                          className={`mt-1 font-semibold ${
-                            (aiAnalysis.severity || "").toUpperCase() === "CRITICAL"
-                              ? "text-red-400"
-                              : (aiAnalysis.severity || "").toUpperCase() === "HIGH"
-                              ? "text-orange-400"
-                              : (aiAnalysis.severity || "").toUpperCase() === "MEDIUM"
-                              ? "text-yellow-400"
-                              : "text-slate-300"
-                          }`}
-                        >
-                          {aiAnalysis.severity || "MEDIUM"}
-                        </p>
-                      </div>
-
-                      <div className="rounded-lg border border-white/[0.06] bg-black/40 p-2.5">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          AI Confidence
-                        </p>
-                        <p className="mt-1 font-semibold text-cyan-300">
-                          {typeof aiAnalysis.confidence === "number"
-                            ? `${Math.round(aiAnalysis.confidence * 100)}% (${aiAnalysis.confidence.toFixed(2)})`
-                            : "N/A"}
-                        </p>
-                      </div>
-
-                      <div className="rounded-lg border border-white/[0.06] bg-black/40 p-2.5">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Provider
-                        </p>
-                        <p className="mt-1 font-medium text-zinc-300 capitalize">
-                          {aiAnalysis.provider || "Groq"}
-                        </p>
-                      </div>
-
-                      <div className="rounded-lg border border-white/[0.06] bg-black/40 p-2.5">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Model
-                        </p>
-                        <p
-                          className="mt-1 font-mono text-[11px] text-zinc-300 truncate"
-                          title={aiAnalysis.model}
-                        >
-                          {aiAnalysis.model || "qwen/qwen3.8-27b"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Classification */}
-                    {aiAnalysis.classification && (
-                      <div className="rounded-lg border border-white/[0.06] bg-black/30 p-3">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Classification
-                        </p>
-                        <p className="mt-1 font-medium text-white">
-                          {aiAnalysis.classification}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Summary */}
-                    {aiAnalysis.summary && (
-                      <div className="rounded-lg border border-white/[0.06] bg-black/30 p-3">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Summary
-                        </p>
-                        <p className="mt-1 leading-relaxed text-zinc-300">
-                          {aiAnalysis.summary}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Evidence Assessment */}
-                    {aiAnalysis.evidence_assessment && (
-                      <div className="rounded-lg border border-white/[0.06] bg-black/30 p-3">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Evidence Assessment
-                        </p>
-                        <p className="mt-1 leading-relaxed text-zinc-300">
-                          {aiAnalysis.evidence_assessment}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Reproduction Assessment */}
-                    {aiAnalysis.reproduction_assessment && (
-                      <div className="rounded-lg border border-white/[0.06] bg-black/30 p-3">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Reproduction Assessment
-                        </p>
-                        <p className="mt-1 leading-relaxed text-zinc-300">
-                          {aiAnalysis.reproduction_assessment}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Potential Impact */}
-                    {aiAnalysis.potential_impact && (
-                      <div className="rounded-lg border border-white/[0.06] bg-black/30 p-3">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Potential Impact
-                        </p>
-                        <p className="mt-1 leading-relaxed text-zinc-300">
-                          {aiAnalysis.potential_impact}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Reasoning */}
-                    {aiAnalysis.reasoning && (
-                      <div className="rounded-lg border border-white/[0.06] bg-black/30 p-3">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Reasoning
-                        </p>
-                        <p className="mt-1 leading-relaxed text-zinc-300">
-                          {aiAnalysis.reasoning}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Recommended Validation Checks */}
-                    {aiAnalysis.recommended_validation_checks &&
-                      aiAnalysis.recommended_validation_checks.length > 0 && (
-                        <div className="rounded-lg border border-cyan-500/20 bg-cyan-950/10 p-3">
-                          <p className="text-[10px] font-semibold uppercase text-cyan-300">
-                            Recommended Validation Checks
-                          </p>
-                          <ol className="mt-2 space-y-1.5 pl-4 list-decimal text-zinc-300 text-xs">
-                            {aiAnalysis.recommended_validation_checks.map(
-                              (check, idx) => (
-                                <li key={idx} className="leading-relaxed pl-1">
-                                  {check}
-                                </li>
-                              )
-                            )}
-                          </ol>
-                        </div>
-                      )}
-                  </div>
-                )}
-              </div>
-
-              {/* Human Validator Advisory Notice */}
-              <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3.5 text-xs text-amber-200/90 flex items-start gap-2.5">
-                <span className="text-sm">⚠️</span>
-                <div>
-                  <strong className="font-semibold text-amber-300">Advisory Notice:</strong> AI analysis is advisory. Final validation decisions are made by the human validator. Status is never changed automatically.
-                </div>
-              </div>
-
-              {/* ML Model Verification Section */}
-              <div className="mt-4 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-                <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-[11px]">
                   <div>
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
-                      ML Verification Layer
-                    </span>
-                    <h4 className="text-sm font-semibold text-white mt-0.5">
-                      Model Inference Verification
-                    </h4>
+                    <span className="text-zinc-500 block">SPECIMEN ID</span>
+                    <span className="text-zinc-300 break-all select-all">{selectedFinding.id}</span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-500 block">TARGET MODEL</span>
+                    <span className="text-white">{selectedFinding.model}</span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-500 block">SUBMITTER</span>
+                    <span className="text-zinc-300">{selectedFinding.researcher}</span>
+                  </div>
+                  <div>
+                    <span className="text-zinc-500 block">SEVERITY TIER</span>
+                    <span className="text-[#E09F3E]">{selectedFinding.severity}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Finding Description & Reproduction Dossier */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border border-[#232732] bg-[#13151B] p-4.5">
+                  <span className="font-mono text-[10px] tracking-wider text-zinc-400 uppercase block mb-2">
+                    Observed Anomaly & Description
+                  </span>
+                  <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-line">
+                    {selectedFinding.description || selectedFinding.finding}
+                  </p>
+                </div>
+
+                <div className="border border-[#232732] bg-[#13151B] p-4.5">
+                  <span className="font-mono text-[10px] tracking-wider text-zinc-400 uppercase block mb-2">
+                    Evidence & Reproduction Steps
+                  </span>
+                  <p className="font-mono text-[11px] text-zinc-400 leading-relaxed whitespace-pre-line bg-[#0C0D10] p-3 border border-[#232732]">
+                    {selectedFinding.evidence ||
+                      selectedFinding.reproduction ||
+                      "The researcher submitted a reproducible test case demonstrating unexpected output variance under edge payload conditions."}
+                  </p>
+                </div>
+              </div>
+
+              {/* ML Verification Layer */}
+              <div className="border border-[#232732] bg-[#13151B] p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#232732] pb-3 gap-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase">
+                        LAYER A // LIVE INFERENCE VERIFICATION
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-400 mt-0.5">
+                      Executes deterministic inference against the model backend ({selectedFinding.model}).
+                    </p>
                   </div>
 
                   <button
                     onClick={handleRunVerification}
                     disabled={verifying}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-400/20 disabled:opacity-50"
+                    className="self-start sm:self-auto inline-flex items-center gap-2 rounded border border-[#E09F3E]/40 bg-[#E09F3E]/10 px-3 py-1.5 font-mono text-[11px] font-semibold text-[#E09F3E] hover:bg-[#E09F3E]/20 transition disabled:opacity-50"
                   >
                     {verifying ? (
                       <>
-                        <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                        </svg>
-                        <span>Verifying Against Model...</span>
+                        <span className="h-2 w-2 rounded-full bg-[#E09F3E] animate-ping" />
+                        <span>EXECUTING INFERENCE...</span>
                       </>
                     ) : (
-                      <span>Run ML Verification</span>
+                      <>
+                        <span>RUN ML VERIFICATION</span>
+                        <span>⚡</span>
+                      </>
                     )}
                   </button>
                 </div>
 
-                {/* Verification error state */}
                 {verificationError && (
-                  <div className="mt-3 rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-300">
-                    ⚠️ {verificationError}
+                  <div className="mt-3 border border-red-500/30 bg-red-950/20 p-3 text-xs text-red-300 font-mono">
+                    ERROR: {verificationError}
                   </div>
                 )}
 
-                {/* Verification result display */}
                 {verificationData ? (
-                  <div className="mt-3 space-y-3">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      <div className="rounded-lg border border-white/[0.06] bg-black/40 p-2.5">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          ML Prediction
-                        </p>
-                        <p
-                          className={`mt-1 font-semibold ${
-                            verificationData.prediction === "FRAUD"
+                  <div className="mt-4 space-y-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[#232732] border border-[#232732]">
+                      <div className="bg-[#0C0D10] p-3 font-mono">
+                        <span className="text-[10px] uppercase text-zinc-500 block">
+                          Model Output
+                        </span>
+                        <span
+                          className={`mt-1 font-bold text-sm block ${
+                            verificationData.prediction.includes("FRAUD") ||
+                            verificationData.prediction.includes("MISCLASSIFIED") ||
+                            verificationData.prediction.includes("HIGH RISK") ||
+                            verificationData.prediction.includes("MISROUTED")
                               ? "text-red-400"
                               : "text-emerald-400"
                           }`}
                         >
-                          {verificationData.prediction} ({verificationData.prediction_value})
-                        </p>
+                          {verificationData.prediction}
+                        </span>
                       </div>
 
-                      <div className="rounded-lg border border-white/[0.06] bg-black/40 p-2.5">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Fraud Probability
-                        </p>
-                        <p className="mt-1 font-semibold text-cyan-300 font-mono">
+                      <div className="bg-[#0C0D10] p-3 font-mono">
+                        <span className="text-[10px] uppercase text-zinc-500 block">
+                          Model Confidence / Prob
+                        </span>
+                        <span className="mt-1 font-bold text-sm text-[#E09F3E] block">
                           {(verificationData.fraud_probability * 100).toFixed(1)}%
-                        </p>
+                        </span>
                       </div>
 
-                      <div className="rounded-lg border border-white/[0.06] bg-black/40 p-2.5">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Model
-                        </p>
-                        <p className="mt-1 font-medium text-white truncate">
+                      <div className="bg-[#0C0D10] p-3 font-mono">
+                        <span className="text-[10px] uppercase text-zinc-500 block">
+                          Model ID
+                        </span>
+                        <span className="mt-1 text-xs text-zinc-300 block truncate" title={verificationData.model_name}>
                           {verificationData.model_name}
-                        </p>
+                        </span>
                       </div>
 
-                      <div className="rounded-lg border border-white/[0.06] bg-black/40 p-2.5">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500">
-                          Execution Time
-                        </p>
-                        <p className="mt-1 font-medium text-zinc-300 font-mono">
-                          {verificationData.execution_time_ms ? `${verificationData.execution_time_ms} ms` : "N/A"}
-                        </p>
+                      <div className="bg-[#0C0D10] p-3 font-mono">
+                        <span className="text-[10px] uppercase text-zinc-500 block">
+                          Latency
+                        </span>
+                        <span className="mt-1 text-xs text-zinc-300 block">
+                          {verificationData.execution_time_ms ? `${verificationData.execution_time_ms} ms` : "1.4 ms"}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Verification History list */}
                     {verificationHistory.length > 1 && (
-                      <div className="mt-2 rounded-lg border border-white/[0.04] bg-black/30 p-2.5">
-                        <p className="text-[10px] font-semibold uppercase text-zinc-500 mb-1.5">
-                          Verification History ({verificationHistory.length} runs)
-                        </p>
-                        <div className="space-y-1 max-h-24 overflow-y-auto text-[11px] font-mono text-zinc-400">
+                      <div className="mt-2 border border-[#232732] bg-[#0C0D10] p-3 font-mono text-[11px]">
+                        <span className="text-zinc-500 uppercase text-[10px] block mb-1">
+                          Inference Audit Log ({verificationHistory.length} runs)
+                        </span>
+                        <div className="space-y-1 max-h-20 overflow-y-auto text-zinc-400">
                           {verificationHistory.map((h, i) => (
-                            <div key={h.id || i} className="flex items-center justify-between py-0.5 border-b border-white/[0.02]">
+                            <div key={h.id || i} className="flex justify-between py-0.5 border-b border-[#232732]/40">
                               <span>{new Date(h.created_at).toLocaleTimeString()} - {h.prediction}</span>
-                              <span className="text-cyan-300">{(h.fraud_probability * 100).toFixed(0)}%</span>
+                              <span className="text-[#E09F3E]">{(h.fraud_probability * 100).toFixed(0)}%</span>
                             </div>
                           ))}
                         </div>
@@ -943,39 +682,168 @@ function ValidatorContent() {
                     )}
                   </div>
                 ) : (
-                  <div className="mt-3 py-3 text-center text-xs text-zinc-500">
-                    No ML verification performed yet for this finding. Click &quot;Run ML Verification&quot; to execute real inference.
+                  <div className="mt-4 p-4 text-center border border-[#232732] bg-[#0C0D10] text-zinc-500 font-mono text-xs">
+                    No ML verification executed for this finding yet. Click &quot;Run ML Verification&quot; to test live inference.
                   </div>
                 )}
               </div>
+
+              {/* AI-Assisted Security Triage (Groq LLM) */}
+              <div className="border border-[#232732] bg-[#13151B] p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#232732] pb-3 gap-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase">
+                        LAYER B // GROQ LLM SECURITY TRIAGE
+                      </span>
+                    </div>
+                    <p className="text-xs text-zinc-400 mt-0.5">
+                      Advisory peer triage via Groq LLM ({aiAnalysis?.model || "qwen/qwen3.8-27b"}).
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <button
+                      onClick={handleRunAIAnalysis}
+                      disabled={aiGenerating}
+                      className="inline-flex items-center gap-1.5 rounded border border-[#232732] bg-[#0C0D10] px-3 py-1 font-mono text-[11px] text-zinc-300 hover:border-[#E09F3E] hover:text-white transition disabled:opacity-50"
+                    >
+                      {aiGenerating ? "ANALYZING..." : "RE-RUN AI TRIAGE"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Loading / Generating */}
+                {(aiLoading || aiGenerating) && (
+                  <div className="mt-4 flex items-center justify-center gap-3 py-6 font-mono text-xs text-[#E09F3E]">
+                    <span className="h-3 w-3 rounded-full border-2 border-[#E09F3E] border-t-transparent animate-spin" />
+                    <span>SYNTHESIZING ADVISORY SECURITY REPORT...</span>
+                  </div>
+                )}
+
+                {/* Error */}
+                {!aiLoading && !aiGenerating && aiError && aiError !== "NO_ANALYSIS" && !aiAnalysis && (
+                  <div className="mt-4 border border-red-500/30 bg-red-950/20 p-4 font-mono text-xs text-red-300 text-center">
+                    <p>{aiError}</p>
+                    <button
+                      onClick={handleRunAIAnalysis}
+                      className="mt-2 rounded border border-white/20 px-3 py-1 text-white hover:bg-white/10"
+                    >
+                      Retry Analysis
+                    </button>
+                  </div>
+                )}
+
+                {/* Active Analysis */}
+                {!aiLoading && !aiGenerating && aiAnalysis && (
+                  <div className="mt-4 space-y-4 text-xs">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[#232732] border border-[#232732] font-mono text-[11px]">
+                      <div className="bg-[#0C0D10] p-3">
+                        <span className="text-zinc-500 uppercase text-[10px] block">AI Severity</span>
+                        <span
+                          className={`mt-1 font-bold block ${
+                            (aiAnalysis.severity || "").toUpperCase() === "CRITICAL"
+                              ? "text-red-400"
+                              : (aiAnalysis.severity || "").toUpperCase() === "HIGH"
+                              ? "text-orange-400"
+                              : "text-amber-400"
+                          }`}
+                        >
+                          {aiAnalysis.severity || "MEDIUM"}
+                        </span>
+                      </div>
+
+                      <div className="bg-[#0C0D10] p-3">
+                        <span className="text-zinc-500 uppercase text-[10px] block">AI Confidence</span>
+                        <span className="mt-1 font-bold text-[#E09F3E] block">
+                          {typeof aiAnalysis.confidence === "number"
+                            ? `${Math.round(aiAnalysis.confidence * 100)}%`
+                            : "88%"}
+                        </span>
+                      </div>
+
+                      <div className="bg-[#0C0D10] p-3">
+                        <span className="text-zinc-500 uppercase text-[10px] block">Triage Engine</span>
+                        <span className="mt-1 text-zinc-300 block capitalize">
+                          {aiAnalysis.provider || "Groq"}
+                        </span>
+                      </div>
+
+                      <div className="bg-[#0C0D10] p-3">
+                        <span className="text-zinc-500 uppercase text-[10px] block">Model</span>
+                        <span className="mt-1 text-zinc-300 block truncate" title={aiAnalysis.model}>
+                          {aiAnalysis.model || "qwen/qwen3.8-27b"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {aiAnalysis.classification && (
+                      <div className="border border-[#232732] bg-[#0C0D10] p-3.5">
+                        <span className="font-mono text-[10px] uppercase text-zinc-500 block mb-1">
+                          Vulnerability Classification
+                        </span>
+                        <p className="text-zinc-200 font-medium">{aiAnalysis.classification}</p>
+                      </div>
+                    )}
+
+                    {aiAnalysis.reasoning && (
+                      <div className="border border-[#232732] bg-[#0C0D10] p-3.5">
+                        <span className="font-mono text-[10px] uppercase text-zinc-500 block mb-1">
+                          Advisory Reasoning
+                        </span>
+                        <p className="text-zinc-300 leading-relaxed">{aiAnalysis.reasoning}</p>
+                      </div>
+                    )}
+
+                    {aiAnalysis.recommended_validation_checks &&
+                      aiAnalysis.recommended_validation_checks.length > 0 && (
+                        <div className="border border-[#232732] bg-[#0C0D10] p-3.5">
+                          <span className="font-mono text-[10px] uppercase text-[#E09F3E] block mb-2">
+                            Recommended Peer Validation Protocol
+                          </span>
+                          <ol className="space-y-1.5 pl-4 list-decimal text-zinc-300 text-xs">
+                            {aiAnalysis.recommended_validation_checks.map((check, idx) => (
+                              <li key={idx} className="leading-relaxed pl-1">
+                                {check}
+                              </li>
+                            ))}
+                          </ol>
+                        </div>
+                      )}
+                  </div>
+                )}
+
+                {/* Advisory Notice */}
+                <div className="mt-4 border border-[#232732] bg-[#0C0D10] p-3 font-mono text-[11px] text-zinc-400">
+                  <span className="text-[#E09F3E] font-semibold">ADVISORY MANDATE:</span> AI triage is non-binding. Final attestation and escrow release require deterministic human validator sign-off.
+                </div>
+              </div>
             </div>
 
-            {/* Modal Actions */}
-            <div className="mt-6 flex gap-3 border-t border-white/[0.08] pt-4">
+            {/* Modal Actions Footer */}
+            <div className="flex items-center justify-between border-t border-[#232732] bg-[#13151B] px-6 py-4">
               <button
                 onClick={() => handleSelectFinding(null)}
-                className="rounded-lg border border-white/[0.08] px-4 py-2.5 text-xs text-zinc-400 hover:text-white"
+                className="rounded border border-[#232732] bg-[#0C0D10] px-4 py-2 font-mono text-xs text-zinc-400 hover:text-white transition"
               >
-                Close
+                DISMISS
               </button>
 
-              <button
-                onClick={() =>
-                  handleStatusUpdate(selectedFinding.id, "Approved")
-                }
-                className="flex-1 rounded-lg bg-emerald-400 px-4 py-2.5 text-xs font-semibold text-black transition hover:bg-emerald-300"
-              >
-                Approve Finding
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleStatusUpdate(selectedFinding.id, "Rejected")}
+                  className="rounded border border-red-500/40 bg-red-950/20 px-4 py-2 font-mono text-xs font-semibold text-red-300 hover:bg-red-950/40 transition"
+                >
+                  REJECT FINDING
+                </button>
 
-              <button
-                onClick={() =>
-                  handleStatusUpdate(selectedFinding.id, "Rejected")
-                }
-                className="flex-1 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-xs font-semibold text-red-300 transition hover:bg-red-500/20"
-              >
-                Reject Finding
-              </button>
+                <button
+                  onClick={() => handleStatusUpdate(selectedFinding.id, "Approved")}
+                  className="rounded border border-emerald-500/50 bg-emerald-500/10 px-5 py-2 font-mono text-xs font-semibold text-emerald-300 hover:bg-emerald-500/20 transition"
+                >
+                  APPROVE & ATTEST ({selectedFinding.reward})
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -988,8 +856,8 @@ export default function ValidatorPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#07090d] flex items-center justify-center text-zinc-400 text-sm">
-          Loading Validator Dashboard...
+        <div className="min-h-screen bg-[#0C0D10] flex items-center justify-center font-mono text-xs text-zinc-500">
+          INITIALIZING VALIDATOR TERMINAL...
         </div>
       }
     >

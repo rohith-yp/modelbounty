@@ -85,147 +85,184 @@ export default function MyBountiesPage() {
   const totalTests = stats?.total_findings ? stats.total_findings * 4 : 98;
 
   return (
-    <main className="min-h-screen bg-[#07090d] text-white">
+    <main className="min-h-screen bg-[#0C0D10] text-[#EDEDF0]">
       <div className="flex min-h-screen">
-        {/* Sidebar */}
         <Sidebar />
 
-        {/* Main Content */}
         <section className="min-w-0 flex-1">
           <Navbar title="My Bounties" />
 
           <div className="mx-auto max-w-7xl p-6 lg:p-8">
-            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            {/* Header Telemetry */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-[#232732] pb-6">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
-                  Model Owner
-                </p>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase">
+                    01 // MODEL OWNER PORTFOLIO
+                  </span>
+                  <span className="inline-block h-1 w-1 rounded-full bg-[#E09F3E]" />
+                  <span className="font-mono text-[10px] text-zinc-500 uppercase">
+                    ESCROW MANAGEMENT
+                  </span>
+                </div>
 
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-                  My Bounties
-                </h2>
+                <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                  Published Model Bounties
+                </h1>
 
-                <p className="mt-2 text-sm text-zinc-500">
-                  Manage your published models and monitor independent verification.
+                <p className="mt-1 text-xs text-zinc-400">
+                  Manage active AI model escrow pools, monitor stress test frequency, and track verified boundary vulnerabilities.
                 </p>
               </div>
 
               <Link
                 href="/create-bounty"
-                className="inline-flex items-center justify-center rounded-lg bg-cyan-300 px-4 py-2 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200"
+                className="self-start sm:self-auto inline-flex items-center gap-2 rounded border border-[#E09F3E] bg-[#E09F3E] px-4 py-2 font-mono text-xs font-semibold text-black transition hover:bg-[#E09F3E]/90"
               >
-                + Create Bounty
+                <span>+ DEPLOY NEW BOUNTY</span>
               </Link>
             </div>
 
-            {/* Stats */}
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 mb-8">
-              <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5">
-                <div className="text-xs text-zinc-600">Active Bounties</div>
-                <div className="mt-3 text-2xl font-semibold">{activeCount}</div>
-                <div className="mt-2 text-[11px] text-cyan-300/70">
-                  Published models
+            {/* Metrics Strip */}
+            <div className="mt-6 grid grid-cols-1 gap-px bg-[#232732] sm:grid-cols-2 lg:grid-cols-4 border border-[#232732]">
+              <div className="bg-[#13151B] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                    Active Campaigns
+                  </span>
+                  <span className="font-mono text-[10px] text-emerald-400">LIVE</span>
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="font-mono text-3xl font-bold tracking-tight text-white">
+                    {activeCount}
+                  </span>
+                  <span className="text-[11px] text-zinc-500">models in audit</span>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5">
-                <div className="text-xs text-zinc-600">Total Tests</div>
-                <div className="mt-3 text-2xl font-semibold">{totalTests}</div>
-                <div className="mt-2 text-[11px] text-zinc-500">
-                  Stress tests run
+              <div className="bg-[#13151B] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                    Inference Stress Tests
+                  </span>
+                  <span className="font-mono text-[10px] text-[#E09F3E]">EXECUTIONS</span>
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="font-mono text-3xl font-bold tracking-tight text-white">
+                    {totalTests}
+                  </span>
+                  <span className="text-[11px] text-zinc-500">payload checks</span>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5">
-                <div className="text-xs text-zinc-600">Verified Findings</div>
-                <div className="mt-3 text-2xl font-semibold">{verifiedFindings}</div>
-                <div className="mt-2 text-[11px] text-emerald-400">
-                  Confirmed model issues
+              <div className="bg-[#13151B] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                    Verified Findings
+                  </span>
+                  <span className="font-mono text-[10px] text-[#E09F3E]">ATTESTED</span>
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="font-mono text-3xl font-bold tracking-tight text-white">
+                    {verifiedFindings}
+                  </span>
+                  <span className="text-[11px] text-zinc-500">confirmed anomalies</span>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-white/[0.06] bg-[#090c11] p-5">
-                <div className="text-xs text-zinc-600">Bounty Rewards</div>
-                <div className="mt-3 text-2xl font-semibold text-cyan-300">
-                  {totalRewardPool}
+              <div className="bg-[#13151B] p-5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-400">
+                    Total Escrow Funded
+                  </span>
+                  <span className="font-mono text-[10px] text-emerald-400">SECURED</span>
                 </div>
-                <div className="mt-2 text-[11px] text-zinc-500">
-                  Allocated pool
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="font-mono text-3xl font-bold tracking-tight text-[#E09F3E]">
+                    {totalRewardPool}
+                  </span>
+                  <span className="text-[11px] text-zinc-500">locked rewards</span>
                 </div>
               </div>
             </div>
 
-            {/* Published Bounties List */}
-            <div className="overflow-hidden rounded-xl border border-white/[0.06] bg-[#090c11]">
-              <div className="border-b border-white/[0.06] px-5 py-4">
-                <h3 className="text-sm font-medium text-white">
-                  Published Bounties
-                </h3>
-                <p className="mt-1 text-xs text-zinc-600">
-                  Models currently available for independent testing
-                </p>
+            {/* Published Bounties Ledger */}
+            <div className="mt-8 border border-[#232732] bg-[#13151B]">
+              <div className="flex items-center justify-between border-b border-[#232732] px-6 py-4">
+                <div>
+                  <span className="font-mono text-[10px] tracking-[0.2em] text-[#E09F3E] uppercase block">
+                    02 // REGISTERED MODEL SPECIMENS
+                  </span>
+                  <h2 className="text-sm font-semibold text-white mt-0.5">
+                    Active Escrow Campaigns
+                  </h2>
+                </div>
+                <span className="font-mono text-[11px] text-zinc-500">
+                  {bountyList.length} CAMPAIGNS REGISTERED
+                </span>
               </div>
 
-              <div className="divide-y divide-white/[0.05]">
+              <div className="divide-y divide-[#232732]">
                 {bountyList.map((bounty) => (
                   <div
                     key={bounty.id || bounty.name}
-                    className="grid gap-4 px-5 py-5 md:grid-cols-[2fr_1fr_1fr_1fr_auto_auto] md:items-center"
+                    className="grid gap-4 p-5 md:grid-cols-[2fr_1fr_1fr_1fr_auto_auto] md:items-center hover:bg-[#0C0D10]/40 transition"
                   >
                     <div>
-                      <div className="text-sm font-medium text-white">
+                      <div className="font-mono text-xs text-white font-medium">
                         {bounty.name}
                       </div>
-                      <div className="mt-1 text-xs text-zinc-600">
-                        {bounty.category}
+                      <div className="mt-0.5 font-mono text-[11px] text-zinc-500">
+                        {bounty.category} • ID: {bounty.id}
                       </div>
                     </div>
 
                     <div>
-                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
-                        Tests
-                      </div>
-                      <div className="mt-1 text-sm text-zinc-300">
+                      <span className="font-mono text-[10px] uppercase text-zinc-500 block">
+                        STRESS TESTS
+                      </span>
+                      <span className="font-mono text-xs text-zinc-300 font-semibold mt-0.5 block">
                         {bounty.tests}
-                      </div>
+                      </span>
                     </div>
 
                     <div>
-                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
-                        Findings
-                      </div>
-                      <div className="mt-1 text-sm text-zinc-300">
+                      <span className="font-mono text-[10px] uppercase text-zinc-500 block">
+                        VERIFIED FINDINGS
+                      </span>
+                      <span className="font-mono text-xs text-[#E09F3E] font-semibold mt-0.5 block">
                         {bounty.findings}
-                      </div>
+                      </span>
                     </div>
 
                     <div>
-                      <div className="text-[10px] uppercase tracking-wider text-zinc-600">
-                        Reward
-                      </div>
-                      <div className="mt-1 text-sm text-zinc-300">
+                      <span className="font-mono text-[10px] uppercase text-zinc-500 block">
+                        ESCROW ALLOCATION
+                      </span>
+                      <span className="font-mono text-xs text-white font-bold mt-0.5 block">
                         {bounty.reward}
-                      </div>
+                      </span>
                     </div>
 
                     <div>
                       <span
-                        className={`rounded-full px-2.5 py-1 text-[10px] ${
+                        className={`inline-block border px-2 py-0.5 font-mono text-[10px] uppercase ${
                           bounty.status === "Testing"
-                            ? "bg-cyan-300/10 text-cyan-300"
-                            : "bg-yellow-300/10 text-yellow-300"
+                            ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-400"
+                            : "border-amber-500/30 bg-amber-950/20 text-amber-400"
                         }`}
                       >
-                        {bounty.status}
+                        {bounty.status === "Testing" ? "ACTIVE AUDIT" : "IN REVIEW"}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div>
                       <Link
                         href={`/research-arena?challenge=${bounty.id}`}
-                        className="rounded-lg bg-cyan-300 px-3 py-1.5 text-xs font-semibold text-[#061014] transition hover:bg-cyan-200"
+                        className="inline-flex items-center gap-1.5 rounded border border-[#232732] bg-[#0C0D10] px-3.5 py-1.5 font-mono text-xs text-zinc-200 transition hover:border-[#E09F3E] hover:text-white"
                       >
-                        Challenge Model →
+                        <span>Challenge Specimen</span>
+                        <span>→</span>
                       </Link>
                     </div>
                   </div>

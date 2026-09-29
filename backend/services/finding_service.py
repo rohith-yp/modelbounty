@@ -25,7 +25,20 @@ def get_findings(
 
 
 def get_finding(db: Session, finding_id: str) -> Optional[Finding]:
-    return db.query(Finding).filter(Finding.id == finding_id).first()
+    finding = db.query(Finding).filter(Finding.id == finding_id).first()
+    if not finding:
+        alias_map = {
+            "submission-001": "finding-approved-01",
+            "submission-002": "finding-rejected-01",
+            "submission-003": "finding-pending-01",
+            "finding-approved-01": "submission-001",
+            "finding-rejected-01": "submission-002",
+            "finding-pending-01": "submission-003",
+        }
+        target_id = alias_map.get(finding_id)
+        if target_id:
+            finding = db.query(Finding).filter(Finding.id == target_id).first()
+    return finding
 
 
 def create_finding(db: Session, finding_in: FindingCreate) -> Finding:
