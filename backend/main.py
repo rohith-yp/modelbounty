@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from backend.config import settings
 from backend.database import init_db
@@ -33,6 +34,11 @@ def on_startup():
 @app.get("/health")
 def root_health():
     return {"status": "ok"}
+
+
+@app.get("/")
+def root_redirect():
+    return RedirectResponse(url="http://localhost:3000")
 
 
 if __name__ == "__main__":
