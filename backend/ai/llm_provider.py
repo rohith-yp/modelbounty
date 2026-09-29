@@ -77,9 +77,9 @@ class GroqProvider(BaseLLMProvider):
         model: Optional[str] = None,
         timeout: Optional[float] = None
     ):
-        self.api_key = api_key or settings.GROQ_API_KEY
-        self.model = model or settings.GROQ_MODEL or "llama-3.3-70b-versatile"
-        self.timeout = timeout or settings.GROQ_TIMEOUT
+        self.api_key = api_key or getattr(settings, "GROQ_API_KEY", None)
+        self.model = model or getattr(settings, "GROQ_MODEL", None) or "qwen/qwen3.8-27b"
+        self.timeout = timeout or getattr(settings, "GROQ_TIMEOUT", 30.0)
 
     def is_configured(self) -> bool:
         return bool(self.api_key and self.api_key.strip())

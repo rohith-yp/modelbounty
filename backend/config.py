@@ -8,6 +8,8 @@ class Settings(BaseSettings):
 
     # Future integration placeholders (optional, non-blocking)
     GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL: Optional[str] = "qwen/qwen3.8-27b"
+    GROQ_TIMEOUT: float = 30.0
     MISTRAL_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
     LLM_PROVIDER: Optional[str] = None
